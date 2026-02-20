@@ -85,9 +85,7 @@ function setupContainer() {
 
     let debounceTimer;
     searchInput.addEventListener("input", (e) => {
-
         clearTimeout(debounceTimer);
-
         debounceTimer = setTimeout(() => {
             search(e.target.value);
         }, 200);
@@ -98,7 +96,7 @@ function setupContainer() {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.for === "search-current-page") {
-        if (searchContainer === null) {
+        if (searchContainer === null || searchContainer === undefined) {
             setupContainer();
         }
         else if (searchContainer.style.display === "none") {
@@ -116,7 +114,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-        if (searchContainer !== null) {
+        if (searchContainer !== null && searchContainer !== undefined) {
             if (searchContainer.style.display !== "none") {
                 e.preventDefault();
                 searchContainer.style.display = "none";

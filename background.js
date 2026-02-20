@@ -1,5 +1,3 @@
-
-
 const defaultSettings = {
 
 };
@@ -18,7 +16,6 @@ chrome.runtime.onInstalled.addListener(details => {
         });
     }
 });
-
 
 
 chrome.commands.onCommand.addListener((command, tab) => {
