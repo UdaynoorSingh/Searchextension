@@ -1,0 +1,61 @@
+{
+    "manifest_version": 3,
+    "name": "Smart Search",
+    "version": "1.0.0",
+    "description": "A brief, plain text summary of the extension's purpose.",
+    // "icons": {
+    //     "16": "images/icon-16.png",
+    //     "32": "images/icon-32.png",
+    //     "48": "images/icon-48.png",
+    //     "128": "images/icon-128.png"
+    // },
+    "action": {
+        // "default_icon": {
+        //     "16": "images/action-icon-16.png",
+        //     "24": "images/action-icon-24.png",
+        //     "32": "images/action-icon-32.png"
+        // },
+        "default_title": "Click Me!"
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "permissions": [
+        "storage",
+        "sidePanel"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "content.css"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "commands": {
+        "search-current-page": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+F",
+                "mac": "Command+Shift+F"
+            },
+            "description": "Search in current page"
+        }
+        // "_execute_action": {
+        //     "suggested_key": {
+        //         "default": "Ctrl+Shift+F",
+        //         "mac": "MacCtrl+Shift+F"
+        //     }
+        // }
+    },
+    "short_name": "AwesomeExt",
+    "version_name": "1.0 Beta",
+    "minimum_chrome_version": "102"
+    // "incognito": "spanning"
+}
