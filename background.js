@@ -18,6 +18,9 @@ chrome.runtime.onInstalled.addListener(details => {
 });
 
 
+
+
+// ! need to add logic where you check tab type and url and based on that take action
 chrome.commands.onCommand.addListener((command, tab) => {
     if (command === "search-current-page") {
         chrome.tabs.sendMessage(tab.id, {

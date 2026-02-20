@@ -7,6 +7,8 @@ let searchInput = null;
 
 let controller = null;
 
+console.log(IGNORED_TAGS);
+
 async function search(query) {
     if (controller) controller.abort();
 
