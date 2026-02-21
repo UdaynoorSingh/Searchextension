@@ -1,9 +1,8 @@
 'use strict';
+/// <reference path="./initializer.js" />
 
 // ! SVGs & Canvas: Text inside <svg> uses <text> elements which behave differently than standard HTML text nodes
 // ! and will break if wrapped in standard HTML highlight tags.
-
-const SearchExt = window.SearchExt || {};
 
 SearchExt.Constants = (function () {
     const IGNORED_TAGS = new Set([

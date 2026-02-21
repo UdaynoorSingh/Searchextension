@@ -4,11 +4,11 @@
 'use strict';
 
 // ? These comments tell vs code that these files both share same environment
+/// <reference path="./core/initializer.js" />
 /// <reference path="./core/constants.js" />
 /// <reference path="./core/parser.js" />
 /// <reference path="./core/highlighter.js" />
 
-const SearchExt = window.SearchExt || {};
 
 // ? Reveal Modules by passing reference to IIFEs
 SearchExt.Content = (function (Parser) {

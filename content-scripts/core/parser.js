@@ -1,6 +1,7 @@
 "use strict";
 
-const SearchExt = window.SearchExt || {};
+/// <reference path="./initializer.js" />
+
 
 SearchExt.Parser = (function (Constants) {
 
