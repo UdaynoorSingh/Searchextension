@@ -2,54 +2,56 @@
 
 const SearchExt = window.SearchExt || {};
 
-SearchExt.Parser = (function(Constants) {
-    
+SearchExt.Parser = (function (Constants) {
+
     function getVisibleTextNodes(root = document.body) {
         const walker = document.createTreeWalker(
             root,
             NodeFilter.SHOW_TEXT,
             {
-                acceptNode(node) {
-                    if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-                    
-                    const parent = node.parentElement;
-                    // Accessing the exposed constant
-                    if (parent && Constants.IGNORED_TAGS.has(parent.tagName)) {
-                        return NodeFilter.FILTER_REJECT;
-                    }
-
-                    return NodeFilter.FILTER_ACCEPT;
-                }
+                acceptNode: nodeFilter
             }
         );
 
         const nodes = [];
         let node;
+
         while ((node = walker.nextNode())) {
             nodes.push({ node, oriText: node.textContent });
         }
+
         return nodes;
     }
 
-    function isNodeVisible(textNode) {
-        const el = textNode.parentElement;
-        if (!el) return false;
+    function nodeFilter(node) {
+        if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
 
-        if (el.checkVisibility) {
-            return el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+        const parentEl = node.parentElement;
+
+        if (parentEl && Constants.IGNORED_TAGS.has(parentEl.tagName)) {
+            return NodeFilter.FILTER_REJECT;
         }
 
-        if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') {
-            return false;
-        }
-
-        const style = getComputedStyle(el);
-        return style.visibility !== "hidden" && parseFloat(style.opacity) > 0;
+        return NodeFilter.FILTER_ACCEPT;
     }
 
-    // Expose the functions so content.js can use them
+    function isNodeVisible(textNode) {
+        const parentEl = textNode.parentElement;
+        if (!parentEl) return false;
+
+        // * checkVisibility is pretty new (since 2023 only) 
+        if (parentEl.checkVisibility) {
+            const isVisible = parentEl.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+            if (!isVisible) return false;
+        }
+
+        const rect = parentEl.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+        // ! Can consider adding getComputedStyle based on performance
+    }
+
     return {
         getVisibleTextNodes,
-        isNodeVisible
     };
+
 })(SearchExt.Constants);
