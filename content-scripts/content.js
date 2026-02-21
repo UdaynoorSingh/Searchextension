@@ -1,170 +1,84 @@
-// * Realize: any global variables declared here will not polulate the runtime environment as content.js runs in its own context 
-// ? This is a comment that tells vs code that these both share same environment
-/// <reference path="./core/constants.js" />
+'use strict';
 
-let searchContainer = null;
-let searchInput = null;
+const SearchExt = window.SearchExt || {};
 
-let controller = null;
+SearchExt.Content = (function(Parser) {
 
-console.log(IGNORED_TAGS);
+    let searchContainer = null;
+    let searchInput = null;
+    let controller = null;
 
-async function search(query) {
-    if (controller) controller.abort();
+    async function search(query) {
+        if (controller) controller.abort();
 
-    controller = new AbortController();
-    const signal = controller.signal;
+        controller = new AbortController();
+        const signal = controller.signal;
 
-    try {
+        try {
+            if (!query.trim()) {
+                console.log("empty query");
+            } else {
 
-        if (signal.aborted) return;
+                const nodes = Parser.getVisibleTextNodes();
+                console.log(nodes);
+            }
 
-        console.log("tried searching " + query);
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-
-function setupContainer() {
-    const body = document.querySelector("body");
-
-    searchContainer = document.createElement("div");
-    searchContainer.classList.add("s-search-container");
-
-    searchInput = document.createElement("input");
-    searchInput.type = "text";
-    searchInput.classList.add("s-search-input");
-
-    searchContainer.appendChild(searchInput);
-    body.prepend(searchContainer);
-
-
-    let debounceTimer;
-    searchInput.addEventListener("input", (e) => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            search(e.target.value);
-        }, 200);
-    });
-
-    searchInput.focus();
-}
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.for === "search-current-page") {
-        if (searchContainer === null || searchContainer === undefined) {
-            setupContainer();
-        }
-        else if (searchContainer.style.display === "none") {
-            searchContainer.style.display = "flex";
-            searchInput.focus();
-            searchInput.select();
-        }
-        else {
-            searchInput.focus();
-            searchInput.select();
+            if (signal.aborted) return;
+            console.log("tried searching " + query + ". Aborted");
+        } catch (error) {
+            console.error(error);
         }
     }
-});
 
+    function setupContainer() {
+        const body = document.body;
+        searchContainer = document.createElement("div");
+        searchContainer.classList.add("s-search-container");
 
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-        if (searchContainer !== null && searchContainer !== undefined) {
-            if (searchContainer.style.display !== "none") {
+        searchInput = document.createElement("input");
+        searchInput.type = "text";
+        searchInput.classList.add("s-search-input");
+
+        searchContainer.appendChild(searchInput);
+        body.prepend(searchContainer);
+
+        let debounceTimer;
+        searchInput.addEventListener("input", (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                search(e.target.value);
+            }, 200);
+        });
+
+        searchInput.focus();
+    }
+
+    function init() {
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (message.for === "search-current-page") {
+                if (!searchContainer) {
+                    setupContainer();
+                } else if (searchContainer.style.display === "none") {
+                    searchContainer.style.display = "flex";
+                    searchInput.focus();
+                    searchInput.select();
+                } else {
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            }
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && searchContainer && searchContainer.style.display !== "none") {
                 e.preventDefault();
                 searchContainer.style.display = "none";
             }
-        }
-    }
-});
-
-
-
-function getVisibleTextNodes(root = document.body) {
-    const walker = document.createTreeWalker(
-        root,
-        NodeFilter.SHOW_TEXT,
-        {
-            acceptNode(node) {
-                // ? Skip empty/whitespace text
-                if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-
-                
-                
-                // ! not checking if node is visible
-                return NodeFilter.FILTER_ACCEPT;
-            }
-        }
-    );
-
-    const nodes = [];
-    let node;
-
-    while ((node = walker.nextNode())) {
-        nodes.push({node, oriText: node.textContent});
-    }
-    
-    return nodes;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ! Choose one of the isNodeVisible later
-// ? isNodeVisible is very expensive so we will run it only when a search match happens if needed
-function isNodeVisible1(textNode) {
-    const el = textNode.parentElement;
-
-    if (!el) return false;
-
-    const style = getComputedStyle(el);
-
-    if (   // rememeber these are not the only text nodes that we don't want
-        style.display === "none" ||
-        style.visibility === "hidden" ||
-        style.visibility === "collapse" ||
-        parseFloat(style.opacity) === 0
-    ) {
-        return false;
-    }
-
-    // Extra check: element must have non-zero size
-    const rect = el.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return false;
-
-    return true;
-}
-
-function isNodeVisible2(textNode) {
-    const el = textNode.parentElement;
-    if (!el) return false;
-
-    // Modern, highly optimized native API for checking visibility
-    // Handles opacity: 0, display: none, visibility: hidden, etc.
-    if (el.checkVisibility) {
-        return el.checkVisibility({
-            checkOpacity: true,
-            checkVisibilityCSS: true
         });
     }
 
-    // Fallback for older browsers
-    if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') {
-        return false; 
-    }
-    
-    const style = getComputedStyle(el);
-    return style.visibility !== "hidden" && parseFloat(style.opacity) > 0;
-}
+    return { init };
+})(SearchExt.Parser);
+
+
+SearchExt.Content.init();

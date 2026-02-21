@@ -20,6 +20,8 @@
             ],
             "js": [
                 "./content-scripts/core/constants.js",
+                "./content-scripts/highlighter.js",
+                "./content-scripts/parser.js",
                 "./content-scripts/content.js"
             ],
             "css": [

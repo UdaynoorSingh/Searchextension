@@ -1,7 +1,8 @@
+'use strict';
+
 const defaultSettings = {
 
 };
-
 
 chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
