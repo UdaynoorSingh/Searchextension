@@ -1,6 +1,6 @@
 "use strict";
 
-/// <reference path="./initializer.js" />
+/// <reference path="../initializer.js" />
 
 
 SearchExt.Parser = (function (Constants) {
@@ -53,6 +53,7 @@ SearchExt.Parser = (function (Constants) {
 
     return {
         getVisibleTextNodes,
+        isNodeVisible
     };
 
 })(SearchExt.Constants);

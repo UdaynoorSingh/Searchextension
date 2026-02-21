@@ -7,11 +7,12 @@
 /// <reference path="./core/initializer.js" />
 /// <reference path="./core/constants.js" />
 /// <reference path="./core/parser.js" />
+/// <reference path="./core/normalizer.js" />
 /// <reference path="./core/highlighter.js" />
 
 
 // ? Reveal Modules by passing reference to IIFEs
-SearchExt.Content = (function (Parser) {
+SearchExt.Content = (function (Parser, Highlighter) {
 
     let searchContainer = null;
     let searchInput = null;
@@ -22,14 +23,20 @@ SearchExt.Content = (function (Parser) {
 
         controller = new AbortController();
         const signal = controller.signal;
+        
+        signal.addEventListener('abort', () => {
+            console.log('Aborted with reason:', signal.reason);
+            Highlighter.clearHighlights();
+        });
 
         try {
-            if (!query.trim()) {
-                console.log("empty query");
-            } else {
+            if (!query.trim()) Highlighter.clearHighlights();
+            else {
 
                 const nodes = Parser.getVisibleTextNodes();
-                console.log(nodes);
+
+
+
             }
 
             if (signal.aborted) return;
@@ -89,7 +96,7 @@ SearchExt.Content = (function (Parser) {
     }
 
     return { init };
-})(SearchExt.Parser);
+})(SearchExt.Parser, SearchExt.Highlighter);
 
 
 SearchExt.Content.init();

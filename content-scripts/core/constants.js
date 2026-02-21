@@ -1,5 +1,5 @@
 'use strict';
-/// <reference path="./initializer.js" />
+/// <reference path="../initializer.js" />
 
 // ! SVGs & Canvas: Text inside <svg> uses <text> elements which behave differently than standard HTML text nodes
 // ! and will break if wrapped in standard HTML highlight tags.
