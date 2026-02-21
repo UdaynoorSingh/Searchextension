@@ -1,8 +1,17 @@
+// * Project uses Revealing Module Pattern
+// ! Look out for cyclic dependancies!!
+// ? There will be cyclic dependancy if manifest.json loads this file before other files have loaded. 
 'use strict';
+
+// ? These comments tell vs code that these files both share same environment
+/// <reference path="./core/constants.js" />
+/// <reference path="./core/parser.js" />
+/// <reference path="./core/highlighter.js" />
 
 const SearchExt = window.SearchExt || {};
 
-SearchExt.Content = (function(Parser) {
+// ? Reveal Modules by passing reference to IIFEs
+SearchExt.Content = (function (Parser) {
 
     let searchContainer = null;
     let searchInput = null;
@@ -30,6 +39,8 @@ SearchExt.Content = (function(Parser) {
         }
     }
 
+    // ! For UDAYNOOR
+    // ? You can add your logic here
     function setupContainer() {
         const body = document.body;
         searchContainer = document.createElement("div");
