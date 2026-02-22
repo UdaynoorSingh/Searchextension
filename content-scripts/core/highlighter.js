@@ -3,6 +3,11 @@
 
 SearchExt.Highlighter = (function () {
 
+    /**
+    * @param {Node} textNode
+    * @param {Number} startIndex
+    * @param {Number} matchLength
+    */
     function highlightTextNode(textNode, startIndex, matchLength) {
 
         // ? textNode.splitText is going to split node present in DOM into 2 parts
@@ -20,14 +25,16 @@ SearchExt.Highlighter = (function () {
             highlightEl.textContent = matchNode.textContent;
             matchNode.parentNode.replaceChild(highlightEl, matchNode);
 
-            return highlightEl;
+            // return highlightEl;
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
-
+    /**
+    * @param {Node} root 
+    */
     function clearHighlights(root = document.body) {
 
         const marks = root.querySelectorAll('mark.search-ext-highlight');

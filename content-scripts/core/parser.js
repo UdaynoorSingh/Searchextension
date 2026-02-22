@@ -5,6 +5,11 @@
 
 SearchExt.Parser = (function (Constants) {
 
+    /**
+    * @param {Node} root -
+    * @param {{ includeMain: boolean, includeNav: boolean, includeCode: boolean }} options 
+    * @returns {Node[]} 
+    */
     function getTextNodes(root = document.body, options) {
         const walker = document.createTreeWalker(
             root,
@@ -13,7 +18,7 @@ SearchExt.Parser = (function (Constants) {
                 acceptNode: nodeFilter
             }
         );
-        
+
 
         const nodes = [];
         let node;
@@ -25,6 +30,10 @@ SearchExt.Parser = (function (Constants) {
         return nodes;
     }
 
+    /**
+    * @param {Node} node
+    * @returns {NodeFilter}
+    */
     function nodeFilter(node) {
         if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
 
@@ -37,6 +46,10 @@ SearchExt.Parser = (function (Constants) {
         return NodeFilter.FILTER_ACCEPT;
     }
 
+    /**
+    * @param {node} textNode -
+    * @returns {boolean} 
+    */
     function isNodeVisible(textNode) {
         const parentEl = textNode.parentElement;
         if (!parentEl) return false;

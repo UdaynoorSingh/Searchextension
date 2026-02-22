@@ -31,13 +31,14 @@ SearchExt.Content = (function (Parser, Normalizer, Matcher, Highlighter) {
         const signal = controller.signal;
 
         signal.addEventListener('abort', () => {
-            // console.log('Aborted with reason:', signal.reason);
+            console.log("cleared the prev query highlights: " + query);
             Highlighter.clearHighlights();
         });
 
         try {
             if (!query.trim()) {
-                Highlighter.clearHighlights();
+                return;
+                // Highlighter.clearHighlights();
             }
             else {
                 const nodes = Parser.getTextNodes(document.body, parserOptions);
@@ -51,6 +52,8 @@ SearchExt.Content = (function (Parser, Normalizer, Matcher, Highlighter) {
                 for (let i = 0; i < nodeObjs.length; i++) {
                     nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
                 }
+
+                // ! Need to remove matches that are not visible
 
                 for (let i = 0; i < nodeObjs.length; i++) {
                     for (let j = 0; j < nodeObjs[i].matches.length; j++) {

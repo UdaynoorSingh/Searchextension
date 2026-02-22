@@ -4,7 +4,6 @@
 SearchExt.Matcher = (function () {
 
     /**
-    * 
     * @param {string} text 
     * @param {string} query 
     * @param {{matchType: string, matchWhole: boolean}} options 
@@ -24,13 +23,11 @@ SearchExt.Matcher = (function () {
     }
 
     /**
-    * 
     * @param {string} text 
     * @param {string} query 
     * @param {boolean} matchWhole 
     * @returns {{startIndex: number, matchLength: number}[]}     
     */
-
     function exactMatch(text, query, matchWhole) {
         const matches = [];
 
