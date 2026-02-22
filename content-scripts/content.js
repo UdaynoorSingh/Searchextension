@@ -17,6 +17,8 @@ SearchExt.Content = (function (Parser, Normalizer, Matcher, Highlighter) {
 
     let searchContainer = null;
     let searchInput = null;
+    let searchRequestId = 0;
+    let searchLoader = null;
     let controller = null;
 
     const normalizerOptions = { removeDiacritics: true, caseInsensitive: true };
@@ -29,6 +31,9 @@ SearchExt.Content = (function (Parser, Normalizer, Matcher, Highlighter) {
 
         controller = new AbortController();
         const signal = controller.signal;
+        
+        const requestId = ++searchRequestId;
+        if (searchLoader) searchLoader.classList.add("is-visible");
 
         signal.addEventListener('abort', () => {
             console.log("cleared the prev query highlights: " + query);
