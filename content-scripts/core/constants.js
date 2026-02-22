@@ -21,7 +21,13 @@ SearchExt.Constants = (function () {
         'METER', 'PROGRESS'
     ]);
 
+    
+
+
+
+
     return {
         IGNORED_TAGS
+
     };
 })();

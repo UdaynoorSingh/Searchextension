@@ -25,7 +25,7 @@ SearchExt.Content = (function (Parser, Highlighter) {
         const signal = controller.signal;
         
         signal.addEventListener('abort', () => {
-            console.log('Aborted with reason:', signal.reason);
+            // console.log('Aborted with reason:', signal.reason);
             Highlighter.clearHighlights();
         });
 
@@ -35,12 +35,11 @@ SearchExt.Content = (function (Parser, Highlighter) {
 
                 const nodes = Parser.getVisibleTextNodes();
 
-
-
+    
             }
 
             if (signal.aborted) return;
-            console.log("tried searching " + query + ". Aborted");
+            // console.log("tried searching " + query + ". Aborted");
         } catch (error) {
             console.error(error);
         }
@@ -63,7 +62,9 @@ SearchExt.Content = (function (Parser, Highlighter) {
         let debounceTimer;
         searchInput.addEventListener("input", (e) => {
             clearTimeout(debounceTimer);
+
             debounceTimer = setTimeout(() => {
+                console.log(e.target.value);
                 search(e.target.value);
             }, 200);
         });
