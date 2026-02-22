@@ -5,7 +5,11 @@
 
 SearchExt.Normalizer = (function () {
 
+    function normalize(text, options) {
+        return text;
+    }
+
     return {
-        
+        normalize
     };
 })();

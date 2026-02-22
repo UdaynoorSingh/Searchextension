@@ -22,6 +22,7 @@
                 "./content-scripts/initializer.js",
                 "./content-scripts/core/constants.js",
                 "./content-scripts/core/normalizer.js",
+                "./content-scripts/core/matcher.js",
                 "./content-scripts/core/parser.js",
                 "./content-scripts/core/highlighter.js",
                 "./content-scripts/content.js"

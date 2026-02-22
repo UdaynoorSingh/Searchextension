@@ -5,7 +5,7 @@
 
 SearchExt.Parser = (function (Constants) {
 
-    function getVisibleTextNodes(root = document.body) {
+    function getTextNodes(root = document.body, options) {
         const walker = document.createTreeWalker(
             root,
             NodeFilter.SHOW_TEXT,
@@ -13,12 +13,13 @@ SearchExt.Parser = (function (Constants) {
                 acceptNode: nodeFilter
             }
         );
+        
 
         const nodes = [];
         let node;
 
         while ((node = walker.nextNode())) {
-            nodes.push({ node, oriText: node.textContent });
+            nodes.push(node);
         }
 
         return nodes;
@@ -52,7 +53,7 @@ SearchExt.Parser = (function (Constants) {
     }
 
     return {
-        getVisibleTextNodes,
+        getTextNodes,
         isNodeVisible
     };
 

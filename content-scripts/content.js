@@ -4,41 +4,62 @@
 'use strict';
 
 // ? These comments tell vs code that these files both share same environment
-/// <reference path="./core/initializer.js" />
+/// <reference path="./initializer.js" />
 /// <reference path="./core/constants.js" />
 /// <reference path="./core/parser.js" />
 /// <reference path="./core/normalizer.js" />
+/// <reference path="./core/matcher.js" />
 /// <reference path="./core/highlighter.js" />
 
 
 // ? Reveal Modules by passing reference to IIFEs
-SearchExt.Content = (function (Parser, Highlighter) {
+SearchExt.Content = (function (Parser, Normalizer, Matcher, Highlighter) {
 
     let searchContainer = null;
     let searchInput = null;
     let controller = null;
+
+    const normalizerOptions = { removeDiacritics: true, caseInsensitive: true };
+    const parserOptions = { includeMain: true, includeNav: true, includeCode: true };
+    // ? possible searchTypes "Exact", "RegEx", "Semantic", "Fuzzy", "Phonetic" 
+    const matcherOptions = { matchType: "Exact", matchWhole: false }
 
     async function search(query) {
         if (controller) controller.abort();
 
         controller = new AbortController();
         const signal = controller.signal;
-        
+
         signal.addEventListener('abort', () => {
             // console.log('Aborted with reason:', signal.reason);
             Highlighter.clearHighlights();
         });
 
         try {
-            if (!query.trim()) Highlighter.clearHighlights();
-            else {
-
-                const nodes = Parser.getVisibleTextNodes();
-
-    
+            if (!query.trim()) {
+                Highlighter.clearHighlights();
             }
+            else {
+                const nodes = Parser.getTextNodes(document.body, parserOptions);
+                const nodeObjs = [];
 
-            if (signal.aborted) return;
+                for (let i = 0; i < nodes.length; i++) {
+                    const normalizedTextContent = Normalizer.normalize(nodes[i].textContent, normalizerOptions);
+                    nodeObjs.push({ node: nodes[i], normalizedTextContent, matches: [] });
+                }
+
+                for (let i = 0; i < nodeObjs.length; i++) {
+                    nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
+                }
+
+                for (let i = 0; i < nodeObjs.length; i++) {
+                    for (let j = 0; j < nodeObjs[i].matches.length; j++) {
+                        const match = nodeObjs[i].matches[j];
+                        Highlighter.highlightTextNode(nodeObjs[i].node, match.startIndex, match.matchLength);
+                    }
+                }
+            }
+            // if (signal.aborted) return;
             // console.log("tried searching " + query + ". Aborted");
         } catch (error) {
             console.error(error);
@@ -97,7 +118,7 @@ SearchExt.Content = (function (Parser, Highlighter) {
     }
 
     return { init };
-})(SearchExt.Parser, SearchExt.Highlighter);
+})(SearchExt.Parser, SearchExt.Normalizer, SearchExt.Matcher, SearchExt.Highlighter);
 
 
 SearchExt.Content.init();

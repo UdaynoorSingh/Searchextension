@@ -14,7 +14,7 @@ SearchExt.Highlighter = (function () {
             const highlightEl = document.createElement('mark');
             highlightEl.className = 'search-ext-highlight';
             highlightEl.style.all = 'unset';
-            highlightEl.style.backgroundColor = 'blue';
+            highlightEl.style.backgroundColor = 'lightblue';
             highlightEl.style.color = 'black';
 
             highlightEl.textContent = matchNode.textContent;
