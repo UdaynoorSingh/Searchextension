@@ -1,39 +1,169 @@
 .s-search-container {
-    all: unset;
-    all: initial;
-    box-sizing: border-box;
-
     position: fixed;
     top: 30px;
     right: 15%;
-    display: flex;
-    width: 150px;
-    height: 30px;
-    border: 1px solid #555555;
-    background-color: #191c20;
-    color: #d5e2e9;
-    padding: 4px 8px;
-    border-radius: 8px;
     z-index: 100000;
+    font-family: "Trebuchet MS", Tahoma, sans-serif;
+    color: #eaf3f7;
+    user-select: none;
+}
+
+.s-search-toolbar {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 360px;
+    height: 38px;
+    padding: 4px 6px;
+    border: 1px solid #2f3a45;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1b242d, #243240);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.24);
+}
+
+.s-drag-handle {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    background: #2d3944;
+    color: #dce6ec;
+    cursor: grab;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.s-search-container.is-dragging .s-drag-handle {
+    cursor: grabbing;
+}
+
+.s-toolbar-btn {
+    box-sizing: border-box;
+    min-width: 34px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #31404d;
+    color: #eaf3f7;
+    cursor: pointer;
+}
+
+.s-toolbar-btn:hover {
+    background: #3c4f5e;
+}
+
+.s-toolbar-btn.is-active {
+    background: #5f7d93;
+}
+
+.s-extra-controls {
+    display: none;
+    align-items: center;
+    gap: 6px;
+}
+
+.s-search-loader {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #8ea4b6;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: s-spin 0.8s linear infinite;
+}
+
+.s-search-loader.is-visible {
+    display: inline-block;
+}
+
+.s-options-panel {
+    box-sizing: border-box;
+    display: none;
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px;
+    border: 1px solid #2f3a45;
+    border-radius: 10px;
+    background: #f3f8fb;
+    color: #18212a;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.s-scope-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #d6e0e7;
+}
+
+.s-option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+.s-option-label {
+    font-weight: 600;
+}
+
+.s-option-check {
+    width: 14px;
+    height: 14px;
+    margin: 0;
 }
 
 .s-search-input {
-    all: unset;
-    all: initial;
     box-sizing: border-box;
-
-
-    height: 100%;
-    width: 100%;
-    padding: 1px 2px;
-    outline: none;
+    flex: 1;
+    height: 28px;
     border: none;
+    outline: none;
     border-radius: 8px;
-    background-color: #191c20 !important;
-    color: #d5e2e9 !important;
+    background: #111a23 !important;
+    color: #eaf3f7 !important;
+    padding: 0 10px;
+    font-size: 14px;
 }
 
+.s-search-input::placeholder {
+    color: #8ca2b5;
+}
 
-.s-hightlight{
+@keyframes s-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.s-hightlight {
     background-color: aquamarine;
+}
+
+@media (max-width: 560px) {
+    .s-search-container {
+        right: 6px;
+        left: 6px;
+    }
+
+    .s-search-toolbar {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .s-options-panel {
+        width: 100%;
+    }
 }
