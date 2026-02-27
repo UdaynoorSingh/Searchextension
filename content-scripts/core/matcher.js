@@ -47,6 +47,13 @@ SearchExt.Matcher = (function () {
         return matches;
     }
 
+    function fuzzyMatch(text, query) {
+        const matches = [];
+
+
+        return matches;
+    }
+
     return {
         match
     };

@@ -13,6 +13,16 @@
     "permissions": [
         "storage"
     ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "assets/search-extension-loading-circle.gif"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
     "content_scripts": [
         {
             "matches": [
