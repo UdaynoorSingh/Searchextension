@@ -17,6 +17,7 @@ SearchExt.Content = (function (Parser, Normalizer, Matcher, Highlighter) {
 
     let searchContainer = null;
     let searchInput = null;
+
     let controller = null;
 
     // ! Remember if you add a new object here and in uiStates you have to bridge them by proxy in uiStates
@@ -30,7 +31,9 @@ SearchExt.Content = (function (Parser, Normalizer, Matcher, Highlighter) {
 
         controller = new AbortController();
         const signal = controller.signal;
-
+        
+  
+  
         signal.addEventListener('abort', () => {
             console.log("cleared the prev query highlights: " + query);
             Highlighter.clearHighlights();
