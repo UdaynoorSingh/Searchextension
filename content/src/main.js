@@ -106,4 +106,23 @@ function init() {
     });
 }
 
+
+export function interceptGlobalKeyEvents(shadowHostElement) {
+    function blockHostKeybinds(e) {
+        if (e.key === "Escape") return;
+        // e.composedPath() returns the event's path, including your shadow host
+        if (e.composedPath().includes(shadowHostElement)) {
+            // Stop the event from reaching the website's listeners
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+    }
+
+    // The 'true' argument is critical. It forces your listener to run in the 
+    // Capture Phase (top-down), beating the website's bubbling listeners.
+    window.addEventListener('keydown', blockHostKeybinds, true);
+    window.addEventListener('keyup', blockHostKeybinds, true);
+    window.addEventListener('keypress', blockHostKeybinds, true);
+}
+
 init();

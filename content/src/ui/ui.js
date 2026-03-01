@@ -1,4 +1,6 @@
 import cssString from "./ui.css?raw";
+import * as Main from "../main.js";
+
 
 // ! Need to add gif showing logic
 export function setupContainer(parserOptions, normalizerOptions, matcherOptions, search) {
@@ -10,6 +12,8 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     host.style.zIndex = "2147483647";
 
     const shadowRoot = host.attachShadow({ mode: "closed" });
+    Main.interceptGlobalKeyEvents(host);
+
     const style = document.createElement("style");
 
     // ! Do not add comments inside of this text it will cause errors
@@ -47,7 +51,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
             return true;
         }
     });
-    let regexFlagsAutoSetted = false;
+    let regexAutoSetted = false;
     // 2. Proxy the main uiStates object
     // ! There is something serious going on with proxies!! They are making searching very slow when search mode is changed
     uiStates = new Proxy(uiStates, {
@@ -81,34 +85,44 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
             if (searchTypeMap[prop]) {
                 // ? This all comes under if value === true other wise it would have caused 6 search statements when chechbox.foreach logic would have ran
                 if (value === true) {
+                    const inputVal = input.value;
                     matcherOptions.matchType = searchTypeMap[prop];
                     // ? When the user changes the mode the input should get refocused
                     input.focus();
-                    
+
+
+                    if (searchTypeMap[prop] === "RegEx") {
+                        // ? if text is not of the form auto add wrapper
+                        if (!(/^\/.*\/[dgimsuyv]*$/.test(inputVal))) {
+
+                            input.value = '/' + inputVal + '/gm';
+                            regexAutoSetted = true;
+                            // ? Since the input is already focused we can use this otherwise we wouldn't have been able to use this
+                            input.setSelectionRange(inputVal.length + 1, inputVal.length + 1);
+                        }
+                    }
+                    else {
+                        if (regexAutoSetted && (/^\/.*\/[gm]*$/.test(inputVal))) {
+                            // ? Removing //gm
+                            input.value = inputVal.match(/^\/(.*)\/[gm]*$/)[1];
+                            input.setSelectionRange(inputVal.length - 3, inputVal.length - 3);
+                            regexAutoSetted = false;
+
+                        }
+                    }
+
+
+                    // ? Stuff like searching should always happen at the end
                     if (searchTypeMap[prop] === "Exact") {
-                        search(input.value);
+                        search(inputVal);
+                        input.spellcheck = true;
                     }
                     else {
                         // ? searching "" will remove current highlights and also stop current on going query
                         search("");
                         uiStates.searchState = "idle";
+                        input.spellcheck = false;
                     }
-
-                    if (searchTypeMap[prop] === "RegEx") {
-                        if (input.value === "") {
-                            input.value = "//gm";
-                            regexFlagsAutoSetted = true;
-                            // ? Since the input is already focused we can use this otherwise we wouldn't have been able to use this
-                            input.setSelectionRange(1, 1);
-                        }
-                    }
-                    else {
-                        if (regexFlagsAutoSetted && input.value === "//gm") {
-                            input.value = "";
-                            input.setSelectionRange(0, 0);
-                        }
-                    }
-
                 }
             }
 
@@ -165,7 +179,11 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     voiceRecBtn.style.display = 'none';
 
     let debouncer = null;
+
+
+    
     input.addEventListener("input", (e) => {
+
         const query = e.target.value;
 
         if (query === "") {
@@ -184,7 +202,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
         }
         else {
             // ? When you are not in normal search mode then changing input should clear current highlights
-            regexFlagsAutoSetted = false;
+            regexAutoSetted = false;
             search("");
         }
 
@@ -415,3 +433,6 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
     return { input, container };
 }
+
+
+

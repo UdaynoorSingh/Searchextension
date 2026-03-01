@@ -64,7 +64,7 @@ input[type="checkbox"]:checked::after {
     top: 5%;
     left: 60%;
     /*box-shadow: h-offset v-offset blur-radius spread-radius color inset; */
-    box-shadow: 0 0 10px 0 var(--gothic-light-faded);
+    /* box-shadow: 0 0 10px 0 var(--gothic-light-faded); */
     
 }
 
@@ -234,7 +234,7 @@ input[type="checkbox"]:checked::after {
     transition: top 0.3s ease-in-out,
         height 0.3s ease-in-out;
     overflow: hidden;
-    box-shadow: 0 0 10px 0 var(--gothic-dark-faded);
+    /* box-shadow: 0 0 10px 0 var(--gothic-dark-faded); */
 
 }
 
