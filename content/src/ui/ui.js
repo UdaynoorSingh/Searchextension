@@ -47,7 +47,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
             return true;
         }
     });
-
+    let regexFlagsAutoSetted = false;
     // 2. Proxy the main uiStates object
     // ! There is something serious going on with proxies!! They are making searching very slow when search mode is changed
     uiStates = new Proxy(uiStates, {
@@ -82,7 +82,9 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
                 // ? This all comes under if value === true other wise it would have caused 6 search statements when chechbox.foreach logic would have ran
                 if (value === true) {
                     matcherOptions.matchType = searchTypeMap[prop];
-
+                    // ? When the user changes the mode the input should get refocused
+                    input.focus();
+                    
                     if (searchTypeMap[prop] === "Exact") {
                         search(input.value);
                     }
@@ -91,6 +93,22 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
                         search("");
                         uiStates.searchState = "idle";
                     }
+
+                    if (searchTypeMap[prop] === "RegEx") {
+                        if (input.value === "") {
+                            input.value = "//gm";
+                            regexFlagsAutoSetted = true;
+                            // ? Since the input is already focused we can use this otherwise we wouldn't have been able to use this
+                            input.setSelectionRange(1, 1);
+                        }
+                    }
+                    else {
+                        if (regexFlagsAutoSetted && input.value === "//gm") {
+                            input.value = "";
+                            input.setSelectionRange(0, 0);
+                        }
+                    }
+
                 }
             }
 
@@ -149,9 +167,10 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     let debouncer = null;
     input.addEventListener("input", (e) => {
         const query = e.target.value;
+
         if (query === "") {
             // ? We should not wait in this case as sending this is supposed to remove highlights and not search for new matches
-            search(query);
+            search("");
             return;
         }
         if (uiStates.normal) {
@@ -163,6 +182,12 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
                 search(query);
             }, 300);
         }
+        else {
+            // ? When you are not in normal search mode then changing input should clear current highlights
+            regexFlagsAutoSetted = false;
+            search("");
+        }
+
     });
 
     inputContainer.append(input, matchCaseBtn, matchWholeBtn, voiceRecBtn);
@@ -199,6 +224,12 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     const searchSvgDiv = document.createElement("div");
     searchSvgDiv.title = "Search";
     searchSvgDiv.classList.add("expand-btn"); // ! You cannot add .rotate class to svg below this it will cause rotation
+
+    searchSvgDiv.addEventListener("click", (e) => {
+        console.log("clicked val: ", input.value);
+        search(input.value);
+    });
+
     const searchSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     searchSvg.setAttribute("width", "25");
     searchSvg.setAttribute("height", "25");

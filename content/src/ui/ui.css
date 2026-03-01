@@ -9,6 +9,7 @@
     --gothic-lighter: #a6a6bf;
     --gothic-lightest: #c1c1d2;
     --gothic-white: #e6e6ec;
+    --border-thickness : 2px;
 }
 
 * {
@@ -54,15 +55,17 @@ input[type="checkbox"]:checked::after {
     display: flex;
     flex-direction: row;
     border-radius: 8px;
+    /* ? There border are for design consitancy they match with the borders of modes-container */
+    border: var(--border-thickness) solid var(--gothic-darker);
     /* padding: 5px 5px 5px 0; */
     background-color: var(--gothic-darker);
     z-index: 2147483647;
-
+    
     top: 5%;
     left: 60%;
     /*box-shadow: h-offset v-offset blur-radius spread-radius color inset; */
     box-shadow: 0 0 10px 0 var(--gothic-light-faded);
-
+    
 }
 
 .search-panel {
@@ -73,7 +76,6 @@ input[type="checkbox"]:checked::after {
     padding: 5px 5px 5px 0;
     background-color: var(--gothic-darker);
     z-index: 10;
-    ;
 }
 
 
@@ -135,10 +137,6 @@ input[type="checkbox"]:checked::after {
     background-color: var(--gothic-dark);
 }
 
-
-.modes-container {
-    position: absolute;
-}
 
 
 .toolbar {
@@ -226,6 +224,7 @@ input[type="checkbox"]:checked::after {
     justify-content: center;
     align-items: center;
     border-radius: 8px;
+    border: var(--border-thickness) solid var(--gothic-lighter);
     padding: 5px 10px 0px 10px;
     background-color: var(--gothic-lightest);
     color: var(--gothic-darkest);

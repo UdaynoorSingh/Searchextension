@@ -19,6 +19,8 @@ export const IGNORED_TAGS = new Set([
     'METER', 'PROGRESS'
 ]);
 
-
+export const PREF = {
+    isDev:false
+};
 
 

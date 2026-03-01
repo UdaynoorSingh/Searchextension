@@ -20,7 +20,7 @@ const matcherOptions = { matchType: "Exact", matchWhole: false }
 
 
 async function search(query) {
-    // console.time("Search Time");
+    Highlighter.clearHighlights();
     if (controller) controller.abort();
 
     controller = new AbortController();
@@ -32,16 +32,15 @@ async function search(query) {
         console.log("cleared the prev query highlights: " + query);
         Highlighter.clearHighlights();
     });
-    
+
     try {
         if (!query) {
             Highlighter.clearHighlights();
             return;
         }
         else {
-            if (normalizerOptions.caseInsensitive) {
-                query = query.toLowerCase();
-            }
+            query = Normalizer.normalize(query, normalizerOptions);
+
 
             const nodes = Parser.getTextNodes(document.body, parserOptions);
             const nodeObjs = [];
@@ -101,7 +100,7 @@ function init() {
         if (e.key === "Escape" && searchContainer && searchContainer.style.display !== "none") {
             e.preventDefault();
             searchContainer.style.display = "none";
-            // When closing you should remove all matches
+            // ? When closing you should remove all matches
             search("");
         }
     });
