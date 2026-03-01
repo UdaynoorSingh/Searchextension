@@ -16,7 +16,7 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "assets/search-extension-loading-circle.gif"
+                "assets/loading-circle.gif"
             ],
             "matches": [
                 "<all_urls>"
@@ -29,16 +29,7 @@
                 "<all_urls>"
             ],
             "js": [
-                "./content-scripts/initializer.js",
-                "./content-scripts/core/constants.js",
-                "./content-scripts/core/normalizer.js",
-                "./content-scripts/core/matcher.js",
-                "./content-scripts/core/parser.js",
-                "./content-scripts/core/highlighter.js",
-                "./content-scripts/content.js"
-            ],
-            "css": [
-                "./content-scripts/css/content.css"
+                "./content/dist/content.js"
             ],
             "run_at": "document_idle"
         }

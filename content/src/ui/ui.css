@@ -3,7 +3,9 @@
     --gothic-darkest: #1a1a24;
     --gothic-darker: #333346;
     --gothic-dark: #535373;
+    --gothic-dark-faded: rgba(83, 83, 115, 0.5);
     --gothic-light: #8080a4;
+    --gothic-light-faded: rgba(128, 128, 164, 0.5);
     --gothic-lighter: #a6a6bf;
     --gothic-lightest: #c1c1d2;
     --gothic-white: #e6e6ec;
@@ -13,7 +15,7 @@
     box-sizing: border-box;
     outline: none;
     border: none;
-} 
+}
 
 input {
     background-color: transparent;
@@ -58,6 +60,9 @@ input[type="checkbox"]:checked::after {
 
     top: 5%;
     left: 60%;
+    /*box-shadow: h-offset v-offset blur-radius spread-radius color inset; */
+    box-shadow: 0 0 10px 0 var(--gothic-light-faded);
+
 }
 
 .search-panel {
@@ -67,7 +72,8 @@ input[type="checkbox"]:checked::after {
     border-radius: 8px;
     padding: 5px 5px 5px 0;
     background-color: var(--gothic-darker);
-    z-index: 10;;
+    z-index: 10;
+    ;
 }
 
 
@@ -92,6 +98,7 @@ input[type="checkbox"]:checked::after {
     align-items: center;
     /* justify-content: center; */
     gap: 5px;
+    padding: 0 10px 0 0;
     border-radius: 4px;
     background-color: var(--gothic-darkest);
 }
@@ -128,9 +135,6 @@ input[type="checkbox"]:checked::after {
     background-color: var(--gothic-dark);
 }
 
-.input-btn:last-of-type {
-    margin-right: 10px;
-}
 
 .modes-container {
     position: absolute;
@@ -185,18 +189,16 @@ input[type="checkbox"]:checked::after {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transform: rotate(0deg);
 
-    transition: background-color 0.25s ease-in-out,
-    transform 0.3s ease-in-out;
+    transition: background-color 0.25s ease-in-out;
 }
 
-.expand-btn > svg{
+.expand-btn>svg {
     transform: rotate(0deg);
     transition: transform 0.3s ease-in-out;
 }
 
-.expand-btn > svg.rotate {
+.expand-btn>svg.rotate {
     transform: rotate(-180deg);
 }
 
@@ -215,7 +217,7 @@ input[type="checkbox"]:checked::after {
 
 .modes-container {
     position: absolute;
-    top: 0;
+    top: 5px;
     height: 0px;
     width: 100%;
     display: flex;
@@ -224,7 +226,7 @@ input[type="checkbox"]:checked::after {
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    padding: 5px 10px 5px 10px;
+    padding: 5px 10px 0px 10px;
     background-color: var(--gothic-lightest);
     color: var(--gothic-darkest);
 
@@ -233,6 +235,8 @@ input[type="checkbox"]:checked::after {
     transition: top 0.3s ease-in-out,
         height 0.3s ease-in-out;
     overflow: hidden;
+    box-shadow: 0 0 10px 0 var(--gothic-dark-faded);
+
 }
 
 .modes-container.opened {

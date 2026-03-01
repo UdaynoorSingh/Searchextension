@@ -1,7 +1,5 @@
 "use strict";
-/// <reference path="../initializer.js" />
 
-SearchExt.Matcher = (function () {
 
     /**
     * @param {string} text 
@@ -9,7 +7,7 @@ SearchExt.Matcher = (function () {
     * @param {{matchType: string, matchWhole: boolean}} options 
     * @returns {{startIndex: number, matchLength: number}[]}     
     */
-    function match(text, query, options) {
+export    function match(text, query, options) {
 
         switch (options.matchType) {
             case "Exact":
@@ -54,7 +52,3 @@ SearchExt.Matcher = (function () {
         return matches;
     }
 
-    return {
-        match
-    };
-})();
