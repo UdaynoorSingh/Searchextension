@@ -11,7 +11,8 @@
         "type": "module"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "offscreen"
     ],
     "web_accessible_resources": [
         {

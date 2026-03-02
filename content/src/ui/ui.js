@@ -178,10 +178,15 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
     voiceRecBtn.style.display = 'none';
 
+    voiceRecBtn.addEventListener("click", (e) => {
+        voiceRecBtn.classList.add("active");
+        chrome.runtime.sendMessage({ target: "background", action: "take-audio-input" });
+    });
+
     let debouncer = null;
 
 
-    
+
     input.addEventListener("input", (e) => {
 
         const query = e.target.value;

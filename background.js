@@ -25,8 +25,49 @@ chrome.runtime.onInstalled.addListener(details => {
 chrome.commands.onCommand.addListener((command, tab) => {
     if (command === "search-current-page") {
         chrome.tabs.sendMessage(tab.id, {
-            for: "search-current-page"
+            target: "tab",
+            action: "search-current-page"
         });
     }
 });
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
+    if (message.target === 'background') {
+        switch (message.action) {
+            case 'take-audio-input':
+        
+                setupOffscreenDocument().then(() => {
+                    chrome.runtime.sendMessage({ target: 'offscreen', action: 'take-audio-input', oriSenderId: sender.tab.id });
+                });
+
+                break;
+
+            case "audio-input-result-delegation":
+                chrome.tabs.sendMessage(message.oriSenderId, { target: "tab", action: "audio-input-result", result: message.result });
+
+                break;
+            default:
+                break;
+        }
+
+    }
+});
+
+
+async function setupOffscreenDocument() {
+    const offscreenUrl = chrome.runtime.getURL('offscreen/offscreen.html');
+    const existingContexts = await chrome.runtime.getContexts({
+        contextTypes: ['OFFSCREEN_DOCUMENT'],
+        documentUrls: [offscreenUrl]
+    });
+
+    if (existingContexts.length > 0) return;
+
+    await chrome.offscreen.createDocument({
+        url: offscreenUrl,
+        reasons: ['USER_MEDIA'],
+        justification: 'Recording voice input for extension features'
+    });
+}
 

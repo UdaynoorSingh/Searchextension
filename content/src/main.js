@@ -77,22 +77,48 @@ async function search(query) {
 
 function init() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.for === "search-current-page") {
-            if (!searchContainer) {
-                // ? Since the variables are already declared we have to use parantesis
-                // ? Name aliasing actualNameComing : newNameHere 
-                ({ input: searchInput, container: searchContainer } = UiSeter.setupContainer(parserOptions, normalizerOptions, matcherOptions, search));
-                searchInput.focus();
-            } else if (searchContainer.style.display === "none") {
-                searchContainer.style.display = "flex";
-                searchInput.focus();
-                searchInput.select();
+        if (message.target === "tab") {
+            switch (message.action) {
+                case "search-current-page":
 
-                search(searchInput.value);
-            } else {
-                searchInput.focus();
-                searchInput.select();
+                    const selectedText = window.getSelection().toString();
+
+                    if (!searchContainer) {
+                        // ? Since the variables are already declared we have to use parantesis
+                        // ? Name aliasing actualNameComing : newNameHere 
+                        ({ input: searchInput, container: searchContainer } = UiSeter.setupContainer(parserOptions, normalizerOptions, matcherOptions, search));
+                        searchInput.value = selectedText;
+                        searchInput.focus();
+                        searchInput.select();
+                        search(searchInput.value);
+                    } else if (searchContainer.style.display === "none") {
+                        searchContainer.style.display = "flex";
+                        if (selectedText !== "") {
+                            searchInput.value = selectedText;
+                        }
+                        searchInput.focus();
+                        searchInput.select();
+
+                        search(searchInput.value);
+                    } else {
+                        if (selectedText !== "") {
+                            searchInput.value = selectedText;
+                        }
+
+                        searchInput.focus();
+                        searchInput.select();
+
+                        search(searchInput.value);
+                    }
+                    break;
+
+                case "audio-input-result":
+                    searchInput.value = message.result;
+                    break;
+                default:
+                    break;
             }
+
         }
     });
 

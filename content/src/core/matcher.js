@@ -1,5 +1,6 @@
 "use strict";
 import * as Constants from "./constants.js"
+import { doubleMetaphone } from 'double-metaphone'
 
 /**
 * @param {string} text 
@@ -10,7 +11,7 @@ import * as Constants from "./constants.js"
 export function match(text, query, options) {
 
     console.log(options.matchType);
-    
+
     switch (options.matchType) {
         case "Exact":
             return exactMatch(text, query, options.matchWhole);
@@ -24,6 +25,7 @@ export function match(text, query, options) {
         case "Semantic":
             break;
         case "Phonetic":
+            return phoneticMatch(text, query);
             break;
 
         default:
@@ -76,7 +78,7 @@ function regexMatch(text, query) {
         // ? here () makes a group showing what to return
         // * A regex matches the  /pattern/flags
         const parsedQuery = query.match(/^\/(.+)\/([dgimsuyv]*)$/);
-        
+
         const pattern = parsedQuery[1];
         const flags = parsedQuery[2];
 
@@ -100,3 +102,33 @@ function fuzzyMatch(text, query) {
     return matches;
 }
 
+
+/**
+* @param {string} text 
+* @param {string} query 
+* @returns {{startIndex: number, matchLength: number}[]}     
+*/
+function phoneticMatch(text, query) {
+    const matches = [];
+    const tokens = [];
+
+    const regex = new RegExp(/[a-zA-Z]+(?:['\-][a-zA-Z]+)*/, 'g');
+
+    for (const match of text.matchAll(regex)) {
+        tokens.push({ text: match[0], startIndex: match.index });
+    }
+
+
+    const queryMetaphones = doubleMetaphone(query);
+
+    tokens.forEach(token => {
+        const metaphones = doubleMetaphone(token.text);
+
+        if (metaphones.includes(queryMetaphones[0]) || metaphones.includes(queryMetaphones[1])) {
+            matches.push({ startIndex: token.startIndex, matchLength: token.text.length });
+        }
+    });
+
+
+    return matches;
+}

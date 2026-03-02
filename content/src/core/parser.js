@@ -1,6 +1,7 @@
 "use strict";
 import * as Constants from "./constants.js";
 
+
 // ! The parser is not returning shadow Dom objects 
 // ! The parser will break all the points where there is a match inside of the contentEditable fix it
 /**
