@@ -1,6 +1,7 @@
 import cssString from "./ui.css?raw";
+import panelCssString from "./panel.css?raw";
 import * as Main from "../main.js";
-
+import { CornerMessage } from "./panel.js";
 
 // ! Need to add gif showing logic
 export function setupContainer(parserOptions, normalizerOptions, matcherOptions, search) {
@@ -17,8 +18,9 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     const style = document.createElement("style");
 
     // ! Do not add comments inside of this text it will cause errors
-    style.textContent = cssString;
+    style.textContent = cssString + panelCssString;
     shadowRoot.appendChild(style);
+
 
     let uiStates = {
         // * Three states idle, searching, searched
@@ -178,14 +180,86 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
     voiceRecBtn.style.display = 'none';
 
-    voiceRecBtn.addEventListener("click", (e) => {
+    let currentRecognition = null;
+    voiceRecBtn.addEventListener("click", async (e) => {
         voiceRecBtn.classList.add("active");
-        chrome.runtime.sendMessage({ target: "background", action: "take-audio-input" });
+
+        let isBrave = false;
+        let isWebkitAvailable = true;
+
+        if (!('webkitSpeechRecognition' in window)) {
+            isWebkitAvailable = false;
+        }
+
+        if (navigator.brave && await navigator.brave.isBrave()) {
+            isBrave = true;
+        }
+
+        if (isWebkitAvailable) {
+            if (currentRecognition !== null) {
+                currentRecognition.abort();
+                currentRecognition = null;
+                voiceRecBtn.classList.remove("active");
+                return;
+            }
+            const recognition = new webkitSpeechRecognition();
+            currentRecognition = recognition;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.continuous = false;
+
+
+            recognition.onaudiostart = () => {
+                // console.log("Voice recognition started.");
+            };
+
+            recognition.onspeechend = () => {
+                // console.log("Speech ended, processing...");
+            };
+
+            recognition.onresult = (event) => {
+                const result = event.results[0][0].transcript;
+                input.value = result;
+                voiceRecBtn.classList.remove("active");
+            };
+
+            recognition.onerror = (event) => {
+                console.error(event.error);
+
+                let errorMsg;
+
+                if (isBrave && (event.error === "network" || event.error === "not-allowed")) {
+                    errorMsg = "Sorry, Brave doesn't support the underlying voice features.";
+                }
+                else if (event.error === "aborted") {
+                    return;
+                }
+                else if (event.error === "network") {
+                    errorMsg = "Voice recognition failed: Network error.";
+                }
+                else if (event.error === "no-speech") {
+                    errorMsg = "Voice recognition failed: No speech detected.";
+                }
+                else {
+                    errorMsg = "New error: " + event.error;
+                }
+
+                new CornerMessage(shadowRoot, errorMsg).show();
+                voiceRecBtn.classList.remove("active");
+            };
+
+            recognition.onend = () => {
+                // console.log("Recognition ended.");
+            };
+            recognition.start();
+        }
+        else {
+            new CornerMessage(shadowRoot, "Sorry, Your browser doesn't support the underlying voice features.");
+            voiceRecBtn.classList.remove("active");
+        }
     });
 
     let debouncer = null;
-
-
 
     input.addEventListener("input", (e) => {
 
@@ -435,6 +509,21 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
             voiceRecBtn.style.display = "none";
         }
     }
+
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.target === "tab") {
+            switch (message.action) {
+                case "show-error":
+                    new CornerMessage(shadowRoot, message.error).show();
+                    break;
+
+                default:
+                    console.log("ui.js > chrome.runtime.onMessage > message.target > default case: " + message.action);
+                    break;
+            }
+        }
+    });
+
 
     return { input, container };
 }

@@ -4,15 +4,15 @@
     "version": "1.0.0",
     "description": "A brief, plain text summary of the extension's purpose.",
     "action": {
-        "default_title": "Click Me!"
+        "default_title": "Click Me!",
+        "default_popup": "popup/popup.html"
     },
     "background": {
         "service_worker": "background.js",
         "type": "module"
     },
     "permissions": [
-        "storage",
-        "offscreen"
+        "storage"
     ],
     "web_accessible_resources": [
         {

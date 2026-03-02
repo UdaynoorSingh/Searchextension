@@ -103,8 +103,8 @@ function init() {
                     } else {
                         if (selectedText !== "") {
                             searchInput.value = selectedText;
-                        }
-
+                        }   
+        
                         searchInput.focus();
                         searchInput.select();
 
@@ -112,9 +112,6 @@ function init() {
                     }
                     break;
 
-                case "audio-input-result":
-                    searchInput.value = message.result;
-                    break;
                 default:
                     break;
             }
