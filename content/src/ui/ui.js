@@ -2,6 +2,7 @@ import cssString from "./ui.css?raw";
 import panelCssString from "./panel.css?raw";
 import * as Main from "../main.js";
 import { CornerMessage } from "./panel.js";
+import * as Constants from "../core/constants.js"
 
 // ! Need to add gif showing logic
 export function setupContainer(parserOptions, normalizerOptions, matcherOptions, search) {
@@ -182,7 +183,6 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
     let currentRecognition = null;
     voiceRecBtn.addEventListener("click", async (e) => {
-        voiceRecBtn.classList.add("active");
 
         let isBrave = false;
         let isWebkitAvailable = true;
@@ -198,13 +198,12 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
         if (isWebkitAvailable) {
             if (currentRecognition !== null) {
                 currentRecognition.abort();
-                currentRecognition = null;
-                voiceRecBtn.classList.remove("active");
                 return;
             }
+            voiceRecBtn.classList.add("active");
             const recognition = new webkitSpeechRecognition();
             currentRecognition = recognition;
-            recognition.lang = 'en-US';
+            recognition.lang = Constants.PREF.langDialect;
             recognition.interimResults = false;
             recognition.continuous = false;
 
@@ -220,7 +219,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
             recognition.onresult = (event) => {
                 const result = event.results[0][0].transcript;
                 input.value = result;
-                voiceRecBtn.classList.remove("active");
+
             };
 
             recognition.onerror = (event) => {
@@ -230,6 +229,9 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
                 if (isBrave && (event.error === "network" || event.error === "not-allowed")) {
                     errorMsg = "Sorry, Brave doesn't support the underlying voice features.";
+                }
+                else if (event.error === "not-allowed") {
+                    errorMsg = "Voice recognition was not allowed on this page.";                    
                 }
                 else if (event.error === "aborted") {
                     return;
@@ -241,21 +243,26 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
                     errorMsg = "Voice recognition failed: No speech detected.";
                 }
                 else {
-                    errorMsg = "New error: " + event.error;
+                    errorMsg = "Voice recognition failed: " + event.error;
                 }
 
                 new CornerMessage(shadowRoot, errorMsg).show();
-                voiceRecBtn.classList.remove("active");
             };
 
+            recognition.onnomatch = () => {
+                new CornerMessage(shadowRoot, "Sorry, Your voice wasn't captured properly.").show();
+            };
+
+            // ? onend always fires no matter what that's why we have classlist.remove and currentRecognition here
             recognition.onend = () => {
+                voiceRecBtn.classList.remove("active");
+                currentRecognition = null;
                 // console.log("Recognition ended.");
             };
             recognition.start();
         }
         else {
             new CornerMessage(shadowRoot, "Sorry, Your browser doesn't support the underlying voice features.");
-            voiceRecBtn.classList.remove("active");
         }
     });
 

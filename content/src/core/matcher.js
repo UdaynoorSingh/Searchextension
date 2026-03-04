@@ -10,19 +10,17 @@ import { doubleMetaphone } from 'double-metaphone'
 */
 export function match(text, query, options) {
 
-    console.log(options.matchType);
-
     switch (options.matchType) {
         case "Exact":
             return exactMatch(text, query, options.matchWhole);
             break;
-
         case "RegEx":
             return regexMatch(text, query);
             break;
         case "Fuzzy":
             break;
         case "Semantic":
+            return semanticMatch(text, query);
             break;
         case "Phonetic":
             return phoneticMatch(text, query);
@@ -96,6 +94,13 @@ function regexMatch(text, query) {
 }
 
 function fuzzyMatch(text, query) {
+    const matches = [];
+
+
+    return matches;
+}
+
+function semanticMatch(text, query) {
     const matches = [];
 
 

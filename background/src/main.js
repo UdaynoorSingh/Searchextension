@@ -36,11 +36,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         switch (message.action) {
             case "show-error-delegation":
                 chrome.tabs.sendMessage(message.oriSenderId, { target: "tab", action: "show-error", error: message.error });
-
+                
             default:
                 break;
         }
-
     }
 });
 

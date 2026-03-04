@@ -20,7 +20,8 @@ export const IGNORED_TAGS = new Set([
 ]);
 
 export const PREF = {
-    isDev:false
+    isDev:false,
+    langDialect: "en-US"
 };
 
 
