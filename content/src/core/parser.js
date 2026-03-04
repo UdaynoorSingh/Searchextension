@@ -1,5 +1,5 @@
 "use strict";
-import * as Constants from "./constants.js";
+import * as Constants from "../_lib/constants.js";
 
 
 // ! The parser is not returning shadow Dom objects 

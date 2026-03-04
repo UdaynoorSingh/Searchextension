@@ -12,7 +12,8 @@
         "type": "module"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "unlimitedStorage"
     ],
     "web_accessible_resources": [
         {
@@ -43,6 +44,9 @@
             },
             "description": "Search in current page"
         }
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'"
     },
     "short_name": "AwesomeExt",
     "version_name": "1.0 Beta",

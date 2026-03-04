@@ -4,7 +4,7 @@ import * as Parser from "./core/parser.js";
 import * as Highlighter from "./core/highlighter.js";
 import * as Normalizer from "./core/normalizer.js";
 import * as Matcher from "./core/matcher.js";
-
+import * as Utils from "./_lib/utils.js"
 
 
 let searchContainer = null;
@@ -39,6 +39,7 @@ async function search(query) {
             return;
         }
         else {
+            // ! Will need to add logic where query is too big
             query = Normalizer.normalize(query, normalizerOptions);
 
 
@@ -50,9 +51,38 @@ async function search(query) {
                 nodeObjs.push({ node: nodes[i], normalizedTextContent, matches: [] });
             }
 
-            for (let i = 0; i < nodeObjs.length; i++) {
-                nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
 
+            if (matcherOptions.matchType === "Semantic") {
+                const nodeChunksObjs = [];
+                for (let i = 0; i < nodeObjs.length; i++) {
+                    const chunks = Utils.splitReadableContent(nodeObjs[i].normalizedTextContent);
+                    nodeObjs[i].chunks = chunks;
+
+                    nodeChunksObjs.push({ nodeIndex: i, chunks });
+                }
+
+                await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-embed-content", nodeChunksObjs });
+                const allMatches = await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-query", query: query });
+                
+                for (let i = 0; i < allMatches.length; i++) {
+                    const nodeIndex = allMatches[i].nodeIndex;
+                    
+                    for (let j = 0; j < allMatches[i].chunkIndices.length; j++) {
+                        let startIndex = 0;
+
+                        for (let k = 0; k < allMatches[i].chunkIndices[j]; k++) {
+                            startIndex += nodeObjs[nodeIndex].chunks[k].length;
+                        }
+                        let matchLength = nodeObjs[nodeIndex].chunks[j].length;
+                        nodeObjs[nodeIndex].matches.push({startIndex, matchLength});
+                    }
+                }
+            
+            }
+            else {
+                for (let i = 0; i < nodeObjs.length; i++) {
+                    nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
+                }
             }
 
             // ! Need to remove matches that are not visible
@@ -103,8 +133,8 @@ function init() {
                     } else {
                         if (selectedText !== "") {
                             searchInput.value = selectedText;
-                        }   
-        
+                        }
+
                         searchInput.focus();
                         searchInput.select();
 

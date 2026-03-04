@@ -2,7 +2,7 @@ import cssString from "./ui.css?raw";
 import panelCssString from "./panel.css?raw";
 import * as Main from "../main.js";
 import { CornerMessage } from "./panel.js";
-import * as Constants from "../core/constants.js"
+import * as Constants from "../_lib/constants.js"
 
 // ! Need to add gif showing logic
 export function setupContainer(parserOptions, normalizerOptions, matcherOptions, search) {
