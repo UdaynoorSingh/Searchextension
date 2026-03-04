@@ -2,6 +2,8 @@
 import * as Constants from "./constants.js"
 import { doubleMetaphone } from 'double-metaphone'
 
+import Fuse from 'fuse.js';
+
 /**
 * @param {string} text 
 * @param {string} query 
@@ -18,6 +20,7 @@ export function match(text, query, options) {
             return regexMatch(text, query);
             break;
         case "Fuzzy":
+            return fuzzyMatch(text, query);
             break;
         case "Semantic":
             return semanticMatch(text, query);
@@ -93,9 +96,42 @@ function regexMatch(text, query) {
     }
 }
 
+
+/**
+* @param {string} text 
+* @param {string} query 
+* @returns {{startIndex: number, matchLength: number}[]}     
+*/
 function fuzzyMatch(text, query) {
     const matches = [];
+    if (!query || query.length === 0) return matches;
 
+    const tokens = [];
+    const regex = new RegExp(/[a-zA-Z]+(?:['\-][a-zA-Z]+)*/, 'g');
+    
+    for (const match of text.matchAll(regex)) {
+        tokens.push({ 
+            word: match[0], 
+            startIndex: match.index 
+        });
+    }
+
+    const fuse = new Fuse(tokens, {
+        keys: ['word'],       
+        threshold: 0.3,        
+        minMatchCharLength: Math.min(2, query.length)
+    });
+
+    const results = fuse.search(query);
+
+    results.forEach(result => {
+        matches.push({
+            startIndex: result.item.startIndex,
+            matchLength: result.item.word.length
+        });
+    });
+
+    matches.sort((a, b) => a.startIndex - b.startIndex);
 
     return matches;
 }
