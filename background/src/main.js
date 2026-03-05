@@ -1,20 +1,11 @@
 'use strict';
-import { embed, cosineSimilarity } from "./core/semantic";
-import * as Constants from "./_lib/constants.js";
+import "./core/install.js";
+import "./core/rating.js";
 
-chrome.runtime.onInstalled.addListener(details => {
-    if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-        chrome.storage.local.set(Constants.DEFAULT_SETTINGS);
-    }
-    else if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-        chrome.storage.local.get(null, (existingSettings) => {
-            const newSettings = {
-                ...Constants.DEFAULT_SETTINGS, ...existingSettings
-            }
-            chrome.storage.local.set(newSettings);
-        });
-    }
-});
+import * as Constants from "./_lib/constants.js";
+import { embed, cosineSimilarity } from "./core/semantic/semantic.js";
+
+
 
 
 let globalEmbeddings = [];
@@ -26,7 +17,6 @@ chrome.commands.onCommand.addListener((command, tab) => {
     }
     // ! Add action listen cmd as well for fallback
 });
-
 
 
 
@@ -71,6 +61,7 @@ async function clearAllPageEmbeddings() {
         // console.log(`Cleared ${keysToRemove.length} page embeddings.`);
     }
 }
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.target === 'background') {
@@ -173,5 +164,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
     }
 });
-
-
