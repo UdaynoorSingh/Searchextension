@@ -34,3 +34,27 @@ function splitByChars(text, numChars) {
 export function splitReadableContent(readableContent, numChars = 50) {
     return splitByChars(readableContent, numChars);
 }
+
+
+export function getCacheKeyUrl(currentHref) {
+    try {
+        const url = new URL(currentHref);
+        
+        // ? Remove the hash (anchor tags)
+        url.hash = ''; 
+        
+        // ? Remove common analytics/tracking parameters
+        const trackingParams = [
+            'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 
+            'utm_content', 'fbclid', 'gclid', 'ref'
+        ];
+        trackingParams.forEach(param => url.searchParams.delete(param));
+        
+        // ? Remove trailing slashes for consistency
+        return url.toString().replace(/\/$/, '');
+        
+    } catch (e) {
+        // Fallback 
+        return currentHref.split('#')[0]; 
+    }
+}

@@ -48,6 +48,10 @@
     "content_security_policy": {
         "extension_pages": "script-src 'self' 'wasm-unsafe-eval'"
     },
+    "options_ui": {
+        "page": "page-options/dist/index.html",
+        "open_in_tab": true
+    },
     "short_name": "AwesomeExt",
     "version_name": "1.0 Beta",
     "minimum_chrome_version": "102"

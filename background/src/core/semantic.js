@@ -1,12 +1,12 @@
 // ? pipeline is a factory function, it automatically handles downloading the model, tokenizing the text, running model and formatting output
 // ? env is global config obj
 import { pipeline, env } from '@xenova/transformers';
-
+import { CustomCache } from "./cache.js";
 
 
 env.useBrowserCache = false;
-// env.useCustomCache = true;
-// env.customCache = new CustomCache('transformers-cache');
+env.useCustomCache = true;
+env.customCache = new CustomCache('transformers-cache');
 env.allowLocalModels = false;
 
 // ? Due to a bug in onnxruntime-web, we must disable multithreading for now.
@@ -26,7 +26,8 @@ class EmbedPipeline {
     }
 }
 
-// Function to convert text to vectors
+
+// ? Function to convert text to vectors
 export async function embed(text) {
     let embedder = await EmbedPipeline.getInstance();
     let result = await embedder(text, { pooling: 'mean', normalize: true });

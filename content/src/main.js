@@ -61,7 +61,7 @@ async function search(query) {
                     nodeChunksObjs.push({ nodeIndex: i, chunks });
                 }
 
-                await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-embed-content", nodeChunksObjs });
+                await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-embed-content", nodeChunksObjs, url: Utils.getCacheKeyUrl(window.location.href)});
                 const allMatches = await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-query", query: query });
                 
                 for (let i = 0; i < allMatches.length; i++) {
