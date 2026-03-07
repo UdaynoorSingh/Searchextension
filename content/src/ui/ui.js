@@ -273,11 +273,6 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
         const query = e.target.value;
 
-        if (query === "") {
-            // ? We should not wait in this case as sending this is supposed to remove highlights and not search for new matches
-            search("");
-            return;
-        }
         if (uiStates.normal) {
             if (debouncer) {
                 clearTimeout(debouncer);
@@ -285,7 +280,8 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
             }
             debouncer = setTimeout(() => {
                 search(query);
-            }, 300);
+            }, 50);
+            search(query);
         }
         else {
             // ? When you are not in normal search mode then changing input should clear current highlights

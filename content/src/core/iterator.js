@@ -15,6 +15,7 @@ export function appendNode(node) {
 }
 
 export function next() {
+    if (nodes.length === 0) return;
     prevIndex = index;
 
     if (index === null) index = 0;
@@ -24,6 +25,7 @@ export function next() {
 }
 
 export function previous() {
+    if (nodes.length === 0) return;
     prevIndex = index;
 
     if (index === null) index = nodes.length - 1;
@@ -39,15 +41,13 @@ export function previous() {
 // ? fromNext determines whether the call is coming from next function or not for removing prev hightlight
 function onIndexChange() {
     
-    console.log(prevIndex, index);
-
     if (prevIndex !== null && nodes[prevIndex]) {
         nodes[prevIndex].style.backgroundColor = 'lightblue';
     }
 
     const currentNode = nodes[index];
     if (currentNode) {
-        currentNode.style.backgroundColor = 'orange'; 
+        currentNode.style.backgroundColor = 'orange';
 
         currentNode.scrollIntoView({
             behavior: 'smooth',

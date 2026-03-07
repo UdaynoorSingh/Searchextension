@@ -49,18 +49,34 @@ function nodeFilter(node) {
 * @param {node} textNode -
 * @returns {boolean} 
 */
+// export function isNodeVisible(textNode) {
+//     const parentEl = textNode.parentElement;
+//     if (!parentEl) return false;
+
+//     // * checkVisibility is pretty new (since 2023 only) 
+//     if (parentEl.checkVisibility) {
+//         const isVisible = parentEl.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+//         if (!isVisible) return false;
+//     }
+
+//     const rect = parentEl.getBoundingClientRect();
+//     return rect.width > 0 && rect.height > 0;
+// }
+
+
 export function isNodeVisible(textNode) {
     const parentEl = textNode.parentElement;
     if (!parentEl) return false;
 
-    // * checkVisibility is pretty new (since 2023 only) 
     if (parentEl.checkVisibility) {
-        const isVisible = parentEl.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
-        if (!isVisible) return false;
+        // Highly performant, avoids reflow
+        return parentEl.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
     }
 
+    // Fallback: This triggers reflow. 
+    // Minimal impact here as Chrome extensions will almost always hit the block above.
     const rect = parentEl.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
-    // ! Can consider adding getComputedStyle based on performance
 }
+// ! Can consider adding getComputedStyle based on performance
 

@@ -16,6 +16,9 @@ let shadowRoot = null;
 let shadowRootHost = null;
 let controller = null;
 
+let lastQuery = null;
+let lastMatchType = null;
+
 // ! Remember if you add a new object here and in uiStates you have to bridge them by proxy in uiStates
 export const normalizerOptions = { removeDiacritics: true, caseInsensitive: true };
 export const parserOptions = { includeMain: true, includeNav: true, includeCode: true };
@@ -23,33 +26,32 @@ export const parserOptions = { includeMain: true, includeNav: true, includeCode:
 export const matcherOptions = { matchType: "Exact", matchWhole: false }
 
 
-// ! Need to improve abort controller strategy
 async function search(query) {
-    // ? Remove prev nodes
-    Iterator.clearNodes();
+    console.log(query);
+    if (query === lastQuery && matcherOptions.matchType === lastMatchType) {
+        return;
+    }
 
-    UiSeter.updateSearchState(Constants.SEARCH_STATES.searching);
-    Highlighter.clearHighlights();
+    lastQuery = query;
+    lastMatchType = matcherOptions.matchType;
+
+
     if (controller) controller.abort();
 
     controller = new AbortController();
     const signal = controller.signal;
 
-
-
-    signal.addEventListener('abort', () => {
-        console.log("cleared the prev query highlights: " + query);
-        // UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
-        Highlighter.clearHighlights();
-    });
+    Iterator.clearNodes();
+    Highlighter.clearHighlights();
+    UiSeter.updateSearchState(Constants.SEARCH_STATES.searching);
 
     try {
         if (!query) {
-            Highlighter.clearHighlights();
             UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
             return;
         }
         else {
+
             // ! Will need to add logic where query is too big
             query = Normalizer.normalize(query, normalizerOptions);
 
@@ -73,7 +75,11 @@ async function search(query) {
                 }
 
                 await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-embed-content", nodeChunksObjs, url: Utils.getCacheKeyUrl(window.location.href) });
+                if (signal.aborted) return;
+
+
                 const allMatches = await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-query", query: query });
+                if (signal.aborted) return;
 
                 for (let i = 0; i < allMatches.length; i++) {
                     const nodeIndex = allMatches[i].nodeIndex;
@@ -98,24 +104,28 @@ async function search(query) {
 
             // ! Need to remove matches that are not visible
 
+
+            // ? Remember the if the user presses or changes the search query then if this is running it is not going to stop
+            // ? It will registar the new search but it will strictly wait for this to end as no await is being used after this line
+
             for (let i = 0; i < nodeObjs.length; i++) {
-                for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {
+                
+                if (!Parser.isNodeVisible(nodeObjs[i].node)) continue;
+                
+                for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {    
                     const match = nodeObjs[i].matches[j];
-                    
                     Iterator.appendNode(Highlighter.highlightTextNode(nodeObjs[i].node, match.startIndex, match.matchLength));
                 }
             }
         }
 
-        // console.timeEnd("Search Time");
-        // if (signal.aborted) return;
-        // console.log("tried searching " + query + ". Aborted");
         UiSeter.updateSearchState(Constants.SEARCH_STATES.complete);
     } catch (error) {
-        console.error(error);
+        console.log(error);
+        lastQuery = null;
+        lastMatchType = null;
         UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
     }
-
 }
 
 
