@@ -4,8 +4,7 @@
     "version": "1.0.0",
     "description": "A brief, plain text summary of the extension's purpose.",
     "action": {
-        "default_title": "Click Me!",
-        "default_popup": "popup/popup.html"
+        "default_title": "Click Me!"
     },
     "background": {
         "service_worker": "./background/dist/background.js",
@@ -15,7 +14,8 @@
         "storage",
         "unlimitedStorage",
         "notifications",
-        "alarms"
+        "alarms",
+        "contextMenus"
     ],
     "web_accessible_resources": [
         {
@@ -35,7 +35,7 @@
             "js": [
                 "./content/dist/content.js"
             ],
-            "run_at": "document_idle"
+            "run_at": "document_start"
         }
     ],
     "commands": {

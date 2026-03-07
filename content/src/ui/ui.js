@@ -1,8 +1,11 @@
-import cssString from "./ui.css?raw";
+import * as Constants from "../_lib/constants.js";
 import panelCssString from "./panel.css?raw";
-import * as Main from "../main.js";
+import cssString from "./ui.css?raw";
+
 import { CornerMessage } from "./panel.js";
-import * as Constants from "../_lib/constants.js"
+import * as Iterator from "../core/iterator.js";
+
+export let updateSearchState = null;
 
 // ! Need to add gif showing logic
 export function setupContainer(parserOptions, normalizerOptions, matcherOptions, search) {
@@ -14,7 +17,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     host.style.zIndex = "2147483647";
 
     const shadowRoot = host.attachShadow({ mode: "closed" });
-    Main.interceptGlobalKeyEvents(host);
+
 
     const style = document.createElement("style");
 
@@ -24,8 +27,6 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
 
     let uiStates = {
-        // * Three states idle, searching, searched
-        searchState: "idle",
         expanded: false,
         matchCase: false,
         matchWhole: false,
@@ -123,7 +124,6 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
                     else {
                         // ? searching "" will remove current highlights and also stop current on going query
                         search("");
-                        uiStates.searchState = "idle";
                         input.spellcheck = false;
                     }
                 }
@@ -231,7 +231,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
                     errorMsg = "Sorry, Brave doesn't support the underlying voice features.";
                 }
                 else if (event.error === "not-allowed") {
-                    errorMsg = "Voice recognition was not allowed on this page.";                    
+                    errorMsg = "Voice recognition was not allowed on this page.";
                 }
                 else if (event.error === "aborted") {
                     return;
@@ -269,6 +269,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     let debouncer = null;
 
     input.addEventListener("input", (e) => {
+
 
         const query = e.target.value;
 
@@ -308,10 +309,46 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     const moveArrows = document.createElement("div");
     moveArrows.style.display = 'none';
     moveArrows.className = "move-arrows";
-    moveArrows.innerHTML = `
-        <svg id="up-arrow" title="Previous" class="arrow" width="25" height="15" viewBox="0 0 25 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7C12.2652 7 12.5196 7.10536 12.7071 7.29289L19.7071 14.2929C20.0976 14.6834 20.0976 15.3166 19.7071 15.7071C19.3166 16.0976 18.6834 16.0976 18.2929 15.7071L12 9.41421L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L11.2929 7.29289C11.4804 7.10536 11.7348 7 12 7Z" fill="#c1c1d2"></path></svg>
-        <svg id="down-arrow" title="Next" class="arrow" width="25" height="15" viewBox="0 0 25 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.29289 8.29289C4.68342 7.90237 5.31658 7.90237 5.70711 8.29289L12 14.5858L18.2929 8.29289C18.6834 7.90237 19.3166 7.90237 19.7071 8.29289C20.0976 8.68342 20.0976 9.31658 19.7071 9.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L4.29289 9.70711C3.90237 9.31658 3.90237 8.68342 4.29289 8.29289Z" fill="#c1c1d2"></path></svg>
-    `;
+
+    // ? svg namespace
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    function createArrowSvg(id, title, pathData) {
+        const svg = document.createElementNS(SVG_NS, "svg");
+        svg.setAttribute("id", id);
+        svg.setAttribute("title", title);
+        svg.setAttribute("class", "arrow");
+        svg.setAttribute("width", "25");
+        svg.setAttribute("height", "15");
+        svg.setAttribute("viewBox", "0 0 25 20");
+        svg.setAttribute("fill", "none");
+
+        const path = document.createElementNS(SVG_NS, "path");
+        path.setAttribute("fill-rule", "evenodd");
+        path.setAttribute("clip-rule", "evenodd");
+        path.setAttribute("d", pathData);
+        path.setAttribute("fill", "#c1c1d2");
+
+        svg.appendChild(path);
+        return svg;
+    }
+    const upPath = "M12 7C12.2652 7 12.5196 7.10536 12.7071 7.29289L19.7071 14.2929C20.0976 14.6834 20.0976 15.3166 19.7071 15.7071C19.3166 16.0976 18.6834 16.0976 18.2929 15.7071L12 9.41421L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L11.2929 7.29289C11.4804 7.10536 11.7348 7 12 7Z";
+    const downPath = "M4.29289 8.29289C4.68342 7.90237 5.31658 7.90237 5.70711 8.29289L12 14.5858L18.2929 8.29289C18.6834 7.90237 19.3166 7.90237 19.7071 8.29289C20.0976 8.68342 20.0976 9.31658 19.7071 9.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L4.29289 9.70711C3.90237 9.31658 3.90237 8.68342 4.29289 8.29289Z";
+
+    const upArrow = createArrowSvg("up-arrow", "Previous", upPath);
+    const downArrow = createArrowSvg("down-arrow", "Next", downPath);
+
+
+    upArrow.addEventListener('click', () => {
+        Iterator.previous();
+    });
+
+    downArrow.addEventListener('click', () => {
+        Iterator.next();
+    });
+
+    moveArrows.appendChild(upArrow);
+    moveArrows.appendChild(downArrow);
     toolBtnSearch.appendChild(moveArrows);
 
     // ? State 2:
@@ -330,7 +367,6 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     searchSvgDiv.classList.add("expand-btn"); // ! You cannot add .rotate class to svg below this it will cause rotation
 
     searchSvgDiv.addEventListener("click", (e) => {
-        console.log("clicked val: ", input.value);
         search(input.value);
     });
 
@@ -349,6 +385,31 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 `;
     searchSvgDiv.appendChild(searchSvg)
     toolBtnSearch.appendChild(searchSvgDiv);
+
+    function onSearchStateChange(newState) {
+        switch (newState) {
+            case Constants.SEARCH_STATES.idle:
+                searchSvgDiv.style.display = "flex";
+                loadingImg.style.display = "none";
+                moveArrows.style.display = "none";
+                break;
+            case Constants.SEARCH_STATES.searching:
+                searchSvgDiv.style.display = "none";
+                loadingImg.style.display = "flex";
+                moveArrows.style.display = "none";
+                break;
+            case Constants.SEARCH_STATES.complete:
+                searchSvgDiv.style.display = "none";
+                loadingImg.style.display = "none";
+                moveArrows.style.display = "flex";
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    updateSearchState = (newState) => { onSearchStateChange(newState); };
 
     const toolBtnExpand = document.createElement("div");
     toolBtnExpand.className = "tool-btn";
@@ -482,23 +543,6 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
     // ? Only goes for input buttons and search button states
     function refreshUi() {
-        switch (uiStates.searchState) {
-            case "idle":
-                searchSvgDiv.style.display = "flex";
-                loadingImg.style.display = "none";
-                moveArrows.style.display = "none";
-                break;
-            case "searching":
-                searchSvgDiv.style.display = "none";
-                loadingImg.style.display = "flex";
-                moveArrows.style.display = "none";
-                break;
-            case "searched":
-                searchSvgDiv.style.display = "none";
-                loadingImg.style.display = "none";
-                moveArrows.style.display = "flex";
-                break;
-        }
 
         if (uiStates.normal) {
             matchCaseBtn.style.display = "flex";
@@ -532,7 +576,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     });
 
 
-    return { input, container };
+    return { input, container, shadowRoot, host };
 }
 
 

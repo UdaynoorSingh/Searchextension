@@ -1,5 +1,5 @@
 "use strict";
-
+import * as Constants from "../_lib/constants.js";
 
 // ? for highlighter to work on matches array the array should be in descending order
 /**
@@ -16,7 +16,7 @@ export function highlightTextNode(textNode, startIndex, matchLength) {
         matchNode.splitText(matchLength);
 
         const highlightEl = document.createElement('mark');
-        highlightEl.className = 'search-ext-highlight';
+        highlightEl.className = Constants.HIGHLIGHTED_EL_CLASSNAME;
         highlightEl.style.all = 'unset';
         highlightEl.style.backgroundColor = 'lightblue';
         highlightEl.style.color = 'black';
@@ -24,7 +24,7 @@ export function highlightTextNode(textNode, startIndex, matchLength) {
         highlightEl.textContent = matchNode.textContent;
         matchNode.parentNode.replaceChild(highlightEl, matchNode);
 
-        // return highlightEl;
+        return highlightEl;
 
     } catch (error) {
         console.error(error);

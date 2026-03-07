@@ -1,25 +1,34 @@
+// ! Be extremely careful high chance of making a circular depandency in main and UiSeter;
 'use strict';
+import * as Constants from "./_lib/constants.js";
 import * as UiSeter from "./ui/ui.js";
 import * as Parser from "./core/parser.js";
 import * as Highlighter from "./core/highlighter.js";
 import * as Normalizer from "./core/normalizer.js";
 import * as Matcher from "./core/matcher.js";
-import * as Utils from "./_lib/utils.js"
+import * as Utils from "./_lib/utils.js";
+import * as Iterator from "./core/iterator.js";
 
 
 let searchContainer = null;
 let searchInput = null;
-
+let shadowRoot = null;
+let shadowRootHost = null;
 let controller = null;
 
 // ! Remember if you add a new object here and in uiStates you have to bridge them by proxy in uiStates
-const normalizerOptions = { removeDiacritics: true, caseInsensitive: true };
-const parserOptions = { includeMain: true, includeNav: true, includeCode: true };
+export const normalizerOptions = { removeDiacritics: true, caseInsensitive: true };
+export const parserOptions = { includeMain: true, includeNav: true, includeCode: true };
 // ? possible searchTypes "Exact", "RegEx", "Semantic", "Fuzzy", "Phonetic" 
-const matcherOptions = { matchType: "Exact", matchWhole: false }
+export const matcherOptions = { matchType: "Exact", matchWhole: false }
 
 
+// ! Need to improve abort controller strategy
 async function search(query) {
+    // ? Remove prev nodes
+    Iterator.clearNodes();
+
+    UiSeter.updateSearchState(Constants.SEARCH_STATES.searching);
     Highlighter.clearHighlights();
     if (controller) controller.abort();
 
@@ -30,12 +39,14 @@ async function search(query) {
 
     signal.addEventListener('abort', () => {
         console.log("cleared the prev query highlights: " + query);
+        // UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
         Highlighter.clearHighlights();
     });
 
     try {
         if (!query) {
             Highlighter.clearHighlights();
+            UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
             return;
         }
         else {
@@ -61,12 +72,12 @@ async function search(query) {
                     nodeChunksObjs.push({ nodeIndex: i, chunks });
                 }
 
-                await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-embed-content", nodeChunksObjs, url: Utils.getCacheKeyUrl(window.location.href)});
+                await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-embed-content", nodeChunksObjs, url: Utils.getCacheKeyUrl(window.location.href) });
                 const allMatches = await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-query", query: query });
-                
+
                 for (let i = 0; i < allMatches.length; i++) {
                     const nodeIndex = allMatches[i].nodeIndex;
-                    
+
                     for (let j = 0; j < allMatches[i].chunkIndices.length; j++) {
                         let startIndex = 0;
 
@@ -74,10 +85,10 @@ async function search(query) {
                             startIndex += nodeObjs[nodeIndex].chunks[k].length;
                         }
                         let matchLength = nodeObjs[nodeIndex].chunks[j].length;
-                        nodeObjs[nodeIndex].matches.push({startIndex, matchLength});
+                        nodeObjs[nodeIndex].matches.push({ startIndex, matchLength });
                     }
                 }
-            
+
             }
             else {
                 for (let i = 0; i < nodeObjs.length; i++) {
@@ -90,7 +101,8 @@ async function search(query) {
             for (let i = 0; i < nodeObjs.length; i++) {
                 for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {
                     const match = nodeObjs[i].matches[j];
-                    Highlighter.highlightTextNode(nodeObjs[i].node, match.startIndex, match.matchLength);
+                    
+                    Iterator.appendNode(Highlighter.highlightTextNode(nodeObjs[i].node, match.startIndex, match.matchLength));
                 }
             }
         }
@@ -98,9 +110,12 @@ async function search(query) {
         // console.timeEnd("Search Time");
         // if (signal.aborted) return;
         // console.log("tried searching " + query + ". Aborted");
+        UiSeter.updateSearchState(Constants.SEARCH_STATES.complete);
     } catch (error) {
         console.error(error);
+        UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
     }
+
 }
 
 
@@ -111,12 +126,18 @@ function init() {
             switch (message.action) {
                 case "search-current-page":
 
+                    if (document.readyState === "loading") {
+                        alert("Please let the page load");
+                        return;
+                    }
+
                     const selectedText = window.getSelection().toString();
 
                     if (!searchContainer) {
                         // ? Since the variables are already declared we have to use parantesis
                         // ? Name aliasing actualNameComing : newNameHere 
-                        ({ input: searchInput, container: searchContainer } = UiSeter.setupContainer(parserOptions, normalizerOptions, matcherOptions, search));
+                        ({ input: searchInput, container: searchContainer, shadowRoot: shadowRoot, host: shadowRootHost } = UiSeter.setupContainer(parserOptions, normalizerOptions, matcherOptions, search));
+                        interceptGlobalKeyEvents(shadowRootHost);
                         searchInput.value = selectedText;
                         searchInput.focus();
                         searchInput.select();
@@ -131,6 +152,12 @@ function init() {
 
                         search(searchInput.value);
                     } else {
+
+                        if (shadowRoot.activeElement === searchInput) {
+                            searchContainer.style.display = "none";
+                            return;
+                        }
+
                         if (selectedText !== "") {
                             searchInput.value = selectedText;
                         }
@@ -141,7 +168,11 @@ function init() {
                         search(searchInput.value);
                     }
                     break;
-
+                case "extension-off":
+                    searchContainer.style.display = "none";
+                    // ? remove hightlights and on going queries 
+                    search("");
+                    break;
                 default:
                     break;
             }
@@ -160,11 +191,17 @@ function init() {
 }
 
 
-export function interceptGlobalKeyEvents(shadowHostElement) {
+function interceptGlobalKeyEvents(shadowHostElement) {
     function blockHostKeybinds(e) {
         if (e.key === "Escape") return;
         // e.composedPath() returns the event's path, including your shadow host
         if (e.composedPath().includes(shadowHostElement)) {
+
+            if (e.key === "Enter" && e.type === "keydown") {
+                e.preventDefault(); // Stop native behaviors like form submission
+                search(searchInput.value);
+            }
+
             // Stop the event from reaching the website's listeners
             e.stopPropagation();
             e.stopImmediatePropagation();
@@ -176,6 +213,8 @@ export function interceptGlobalKeyEvents(shadowHostElement) {
     window.addEventListener('keydown', blockHostKeybinds, true);
     window.addEventListener('keyup', blockHostKeybinds, true);
     window.addEventListener('keypress', blockHostKeybinds, true);
+    // ? Out input tag is getting the input because of the browser's behaviour of adding input when typed
+    // ? This way the input event is also triggered
 }
 
 init();

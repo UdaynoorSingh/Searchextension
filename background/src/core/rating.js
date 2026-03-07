@@ -3,7 +3,7 @@ import { getPreference } from "../_lib/utils.js";
 function showRatingsNotification() {
     chrome.notifications.create("ask-for-ratings-notification", {
         type: 'basic',
-        iconUrl: '/assets/rating-icon.png',
+        iconUrl: '/assets/ratings-icon.png',
         title: 'Liking it so far?',
         message: 'Please rate it on web store.',
         buttons: [

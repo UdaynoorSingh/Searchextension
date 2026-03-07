@@ -20,8 +20,15 @@ export const IGNORED_TAGS = new Set([
 ]);
 
 export const PREF = {
-    isDev:false,
+    isDev: false,
     langDialect: "en-US"
 };
 
 
+export const HIGHLIGHTED_EL_CLASSNAME = "search-ext-highlight";
+
+export const SEARCH_STATES = {
+    idle: 1,
+    searching: 2,
+    complete: 3
+};

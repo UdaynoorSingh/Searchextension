@@ -1,9 +1,12 @@
 'use strict';
 import "./core/install.js";
 import "./core/rating.js";
+import "./core/contextMenu.js";
 
 import * as Constants from "./_lib/constants.js";
 import { embed, cosineSimilarity } from "./core/semantic/semantic.js";
+import { BertForMaskedLM } from "@xenova/transformers";
+import { getPreference } from "./_lib/utils.js";
 
 
 
@@ -11,10 +14,13 @@ import { embed, cosineSimilarity } from "./core/semantic/semantic.js";
 let globalEmbeddings = [];
 
 // ! need to add logic where you check tab type and url and based on that take action
-chrome.commands.onCommand.addListener((command, tab) => {
-    if (command === "search-current-page") {
+chrome.commands.onCommand.addListener(async (command, tab) => {
+    const extensionOn = await getPreference("extensionOn");
+
+    if (command === "search-current-page" && extensionOn) {
         chrome.tabs.sendMessage(tab.id, { target: "tab", action: "search-current-page" });
     }
+
     // ! Add action listen cmd as well for fallback
 });
 
@@ -67,8 +73,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.target === 'background') {
         switch (message.action) {
             case "show-error-delegation":
-                chrome.tabs.sendMessage(message.oriSenderId, { target: "tab", action: "show-error", error: message.error });
+                if (message.delegateTo === "tab") {
+                    chrome.tabs.sendMessage(message.oriSenderId, { target: "tab", action: "show-error", error: message.error });
+                }
+
                 break;
+
             case "semantic-search-embed-content":
                 (async () => {
                     const pageUrl = message.url;
@@ -136,8 +146,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     allScoredChunks.sort((a, b) => b.score - a.score);
 
                     // 3. Take only the top 5 results, AND ensure they meet a minimum strict baseline
-                    const STRICT_BASELINE = 0.81;
-                    const topResults = allScoredChunks.slice(0, 5).filter(item => item.score > STRICT_BASELINE);
+                    const STRICT_BASELINE = 0.8;
+                    const topResults = allScoredChunks.slice(0, 10).filter(item => item.score > STRICT_BASELINE);
 
                     // 4. Group back into your expected Map structure
                     const resultsMap = new Map();
@@ -164,3 +174,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
     }
 });
+
+
+chrome.action.onClicked.addListener(async (tab) => {
+    const extensionOn = await getPreference("extensionOn");
+    if (extensionOn) {
+        chrome.tabs.sendMessage(tab.id, { target: "tab", action: "search-current-page" });
+    }
+});
+
