@@ -9,13 +9,15 @@
     --gothic-lighter: #a6a6bf;
     --gothic-lightest: #c1c1d2;
     --gothic-white: #e6e6ec;
-    --border-thickness : 2px;
+    --border-thickness: 2px;
 }
 
 * {
     box-sizing: border-box;
     outline: none;
     border: none;
+    padding: 0;
+    margin: 0;
 }
 
 input {
@@ -60,12 +62,12 @@ input[type="checkbox"]:checked::after {
     /* padding: 5px 5px 5px 0; */
     background-color: var(--gothic-darker);
     z-index: 2147483647;
-    
+
     top: 5%;
     left: 60%;
     /*box-shadow: h-offset v-offset blur-radius spread-radius color inset; */
     /* box-shadow: 0 0 10px 0 var(--gothic-light-faded); */
-    
+
 }
 
 .search-panel {
@@ -78,6 +80,42 @@ input[type="checkbox"]:checked::after {
     z-index: 10;
 }
 
+.iterator-pane {
+    position: absolute;
+    /* top: -58%; */
+    top: -0%;
+    left: 71.5%;
+    width: 100px;
+    height: 20px;
+    background-color: var(--gothic-lighter);
+    color: var(--gothic-darkest);
+    border: var(--border-thickness) solid var(--gothic-light);
+
+    border-radius: 4px 4px 0px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: -10;
+
+    transition: top 1s ease-in-out;
+}
+
+.iterator-pane-input {
+    width: 35px;
+    height: 100%;
+    color: var(--gothic-darkest);
+    text-align: center;
+    font-size: 14px;
+}
+
+.iterator-pane-result {
+    width: 35px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
 
 .drag-handle {
     width: fit-content;
@@ -106,6 +144,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .input {
+    width: 150px;
     height: 100%;
     padding: 5px 0px 5px 10px;
     font-size: medium;
@@ -114,6 +153,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .input-btn {
+    /* min-width: 30px; */
     width: 30px;
     height: 30px;
     border-radius: 4px;

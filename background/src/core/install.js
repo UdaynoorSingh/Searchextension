@@ -10,7 +10,7 @@ chrome.runtime.onInstalled.addListener(async details => {
 
         // TODO: chrome.tabs.create({ url: 'chrome://newtab' });
         // TODO: chrome.runtime.setUninstallURL('https://www.ainoyash.com/projects/pokemon-retro-themes/help-and-feedback');
-    
+        
     }
     else if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
 

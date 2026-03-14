@@ -8,36 +8,42 @@ import * as Normalizer from "./core/normalizer.js";
 import * as Matcher from "./core/matcher.js";
 import * as Utils from "./_lib/utils.js";
 import * as Iterator from "./core/iterator.js";
-
+import { stopDynamicSearch, startDynamicSearch } from "./core/dynamic-search.js";
 
 let searchContainer = null;
 let searchInput = null;
 let shadowRoot = null;
 let shadowRootHost = null;
+let iteratorPane = null;
+
 let controller = null;
 
 let lastQuery = null;
-let lastMatchType = null;
+let optionsChangedObj = { optionsChanged : false };
+
+
 
 // ! Remember if you add a new object here and in uiStates you have to bridge them by proxy in uiStates
-export const normalizerOptions = { removeDiacritics: true, caseInsensitive: true };
+export const normalizerOptions = { matchDiacritics: false, caseInsensitive: true };
 export const parserOptions = { includeMain: true, includeNav: true, includeCode: true };
 // ? possible searchTypes "Exact", "RegEx", "Semantic", "Fuzzy", "Phonetic" 
 export const matcherOptions = { matchType: "Exact", matchWhole: false }
 
 
 async function search(query) {
-    console.log(query);
-    if (query === lastQuery && matcherOptions.matchType === lastMatchType) {
+
+
+    if (query === lastQuery && !optionsChangedObj.optionsChanged) {
         return;
     }
 
     lastQuery = query;
-    lastMatchType = matcherOptions.matchType;
+    optionsChangedObj.optionsChanged = false;
 
 
     if (controller) controller.abort();
 
+    stopDynamicSearch(); // ? Remove older observer
     controller = new AbortController();
     const signal = controller.signal;
 
@@ -102,26 +108,27 @@ async function search(query) {
                 }
             }
 
-            // ! Need to remove matches that are not visible
-
-
             // ? Remember the if the user presses or changes the search query then if this is running it is not going to stop
             // ? It will registar the new search but it will strictly wait for this to end as no await is being used after this line
 
+            Iterator.init(iteratorPane);
+
             for (let i = 0; i < nodeObjs.length; i++) {
-                
+                // ? For performance issues this is here 
+                // ? We may as well put this in parser for semantic search
                 if (!Parser.isNodeVisible(nodeObjs[i].node)) continue;
-                
-                for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {    
+
+                for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {
                     const match = nodeObjs[i].matches[j];
                     Iterator.appendNode(Highlighter.highlightTextNode(nodeObjs[i].node, match.startIndex, match.matchLength));
                 }
             }
         }
 
+        startDynamicSearch(query, matcherOptions, normalizerOptions, parserOptions, signal);
         UiSeter.updateSearchState(Constants.SEARCH_STATES.complete);
     } catch (error) {
-        console.log(error);
+        console.log("main > search", error);
         lastQuery = null;
         lastMatchType = null;
         UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
@@ -131,7 +138,7 @@ async function search(query) {
 
 
 function init() {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         if (message.target === "tab") {
             switch (message.action) {
                 case "search-current-page":
@@ -146,7 +153,7 @@ function init() {
                     if (!searchContainer) {
                         // ? Since the variables are already declared we have to use parantesis
                         // ? Name aliasing actualNameComing : newNameHere 
-                        ({ input: searchInput, container: searchContainer, shadowRoot: shadowRoot, host: shadowRootHost } = UiSeter.setupContainer(parserOptions, normalizerOptions, matcherOptions, search));
+                        ({ input: searchInput, container: searchContainer, shadowRoot: shadowRoot, host: shadowRootHost, iteratorPane: iteratorPane } = await UiSeter.setupContainer(parserOptions, normalizerOptions, matcherOptions, optionsChangedObj, search));
                         interceptGlobalKeyEvents(shadowRootHost);
                         searchInput.value = selectedText;
                         searchInput.focus();
@@ -165,6 +172,7 @@ function init() {
 
                         if (shadowRoot.activeElement === searchInput) {
                             searchContainer.style.display = "none";
+                            search("");
                             return;
                         }
 
@@ -212,6 +220,17 @@ function interceptGlobalKeyEvents(shadowHostElement) {
                 search(searchInput.value);
             }
 
+            if (e.type === "keydown") {
+                if (e.key === "ArrowUp") {
+                    e.preventDefault(); // Prevent cursor jumping to start
+                    Iterator.previous();
+                } else if (e.key === "ArrowDown") {
+                    e.preventDefault(); // Prevent cursor jumping to end
+                    Iterator.next();
+                }
+            }
+
+
             // Stop the event from reaching the website's listeners
             e.stopPropagation();
             e.stopImmediatePropagation();
@@ -222,7 +241,7 @@ function interceptGlobalKeyEvents(shadowHostElement) {
     // Capture Phase (top-down), beating the website's bubbling listeners.
     window.addEventListener('keydown', blockHostKeybinds, true);
     window.addEventListener('keyup', blockHostKeybinds, true);
-    window.addEventListener('keypress', blockHostKeybinds, true);
+    window.addEventListener('keypress', blockHostKeybinds, true); // * keypress is a deprecated event and also it is not supposed to fire on non-printable chars
     // ? Out input tag is getting the input because of the browser's behaviour of adding input when typed
     // ? This way the input event is also triggered
 }

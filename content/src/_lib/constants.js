@@ -24,8 +24,18 @@ export const PREF = {
     langDialect: "en-US"
 };
 
+export const DEFAULT_SETTINGS = {
+    extensionOn: true,
+    askForRatingsAlarmLimit: 7, // * In days
+    isDev: false,
+    langDialect: "en-US",
+    showMatchDiacritics: false,
+    scrollSnap: false,
+};
+
 
 export const HIGHLIGHTED_EL_CLASSNAME = "search-ext-highlight";
+export const HIGHLIGHTED_EL_TAGNAME = "MARK";
 
 export const SEARCH_STATES = {
     idle: 1,

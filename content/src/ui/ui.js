@@ -4,11 +4,12 @@ import cssString from "./ui.css?raw";
 
 import { CornerMessage } from "./panel.js";
 import * as Iterator from "../core/iterator.js";
+import { getPreference } from "../_lib/utils.js";
 
 export let updateSearchState = null;
 
 // ! Need to add gif showing logic
-export function setupContainer(parserOptions, normalizerOptions, matcherOptions, search) {
+export async function setupContainer(parserOptions, normalizerOptions, matcherOptions, optionsChangedObj, search) {
     const body = document.body;
 
     const host = document.createElement("div");
@@ -18,6 +19,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
     const shadowRoot = host.attachShadow({ mode: "closed" });
 
+    const isDev = await getPreference("isDev");
 
     const style = document.createElement("style");
 
@@ -30,6 +32,7 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
         expanded: false,
         matchCase: false,
         matchWhole: false,
+        matchDiacritics: false,
         searchArea: {
             main: true,
             nav: true,
@@ -46,10 +49,13 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     uiStates.searchArea = new Proxy(uiStates.searchArea, {
         set(target, prop, value) {
             Reflect.set(target, prop, value);
+            input.focus(); // ? When some prop changes user most likely wants to iterate this is purely for keyboard users so that they can instantly use their keyboard after changing an option
+            optionsChangedObj.optionsChanged = true;
 
             // Map searchArea properties to parserOptions
             const parserMap = { main: 'includeMain', nav: 'includeNav', code: 'includeCode' };
             if (parserMap[prop]) parserOptions[parserMap[prop]] = value;
+
 
             search(input.value);
             return true;
@@ -61,6 +67,8 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     uiStates = new Proxy(uiStates, {
         set(target, prop, value) {
             Reflect.set(target, prop, value);
+            input.focus(); // ? When some prop changes user most likely wants to iterate this is purely for keyboard users so that they can instantly use their keyboard after changing an option
+            optionsChangedObj.optionsChanged = true;
 
             // Map boolean toggles
             if (prop === 'matchCase') {
@@ -70,6 +78,11 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
             if (prop === 'matchWhole') {
                 matcherOptions.matchWhole = value
+                search(input.value);
+            };
+
+            if (prop === 'matchDiacritics') {
+                normalizerOptions.matchDiacritics = value
                 search(input.value);
             };
 
@@ -145,6 +158,20 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     const searchPanel = document.createElement("div");
     searchPanel.className = "search-panel";
 
+    const iteratorPane = document.createElement("div");
+    iteratorPane.classList.add("iterator-pane");
+
+    const iteratorPaneInput = document.createElement("input");
+    iteratorPaneInput.classList.add("iterator-pane-input");
+    const iteratorPaneMiddleSlash = document.createTextNode("/");
+    const iteratorPaneResult = document.createElement("span");
+    iteratorPaneResult.innerText = "1234";
+    iteratorPaneResult.classList.add("iterator-pane-result");
+
+
+    iteratorPane.append(iteratorPaneInput, iteratorPaneMiddleSlash, iteratorPaneResult);
+
+
     // Drag Handle
     const dragHandle = document.createElement("div");
     dragHandle.title = "Drag";
@@ -172,6 +199,18 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     matchWholeBtn.className = "input-btn";
     matchWholeBtn.id = "match-whole-btn";
     matchWholeBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="#c1c1d2" d="M3 19.025q-.825 0-1.413-.587T1 17.025v-2q0-.425.288-.712T2 14.025q.425 0 .713.288t.287.712v2h18v-2q0-.425.288-.713t.712-.287q.425 0 .713.288t.287.712v2q0 .825-.588 1.413T21 19.024H3Zm4.35-3.8q-1.225 0-1.925-.637t-.7-1.738q0-1.05.813-1.712t2.087-.663q.575 0 1.063.088t.837.287v-.35q0-.675-.463-1.075t-1.262-.4q-.375 0-.712.113t-.613.312q-.225.175-.487.2T5.5 9.5q-.225-.175-.275-.438t.15-.462q.45-.425 1.063-.65t1.387-.225q1.55 0 2.375.738t.825 2.137v3.675q0 .3-.213.513T10.3 15q-.325 0-.537-.213t-.213-.537v-.1h-.075q-.325.5-.875.788t-1.25.287Zm.55-3.575q-.8 0-1.225.313t-.425.887q0 .5.375.813t.975.312q.8 0 1.363-.562t.562-1.363q-.35-.2-.8-.3t-.825-.1Zm8.425 3.575q-1.025 0-1.562-.45t-.688-.7H14v.325q0 .3-.212.513t-.513.212q-.3 0-.525-.225t-.225-.525V5.75q0-.325.225-.55t.55-.225q.325 0 .55.225t.225.55V7.8L14 8.8h.075q.075-.125.6-.638t1.65-.512q1.6 0 2.525 1.15t.925 2.65q0 1.5-.912 2.638t-2.538 1.137ZM16.1 9.05q-1 0-1.55.738T14 11.425q0 .925.55 1.65t1.55.725q1 0 1.563-.725t.562-1.65q0-.925-.563-1.65T16.1 9.05Z" /></svg>`;
+
+
+    const showMatchDiacritics = await getPreference("showMatchDiacritics");
+    console.log(showMatchDiacritics);
+
+    const matchDiacriticsBtn = document.createElement("div");
+    matchDiacriticsBtn.title = "Match Diacritics";
+    matchDiacriticsBtn.className = "input-btn";
+    matchDiacriticsBtn.id = "match-diacritics-btn";
+    matchDiacriticsBtn.innerHTML = `<svg width="25" height="25" viewBox="-0.65 -0.62 20 20" fill="none"><path fill="#C1C1D2" d="M3.69602 14H2.2983L5.43892 5.27273H6.96023L10.1009 14H8.70312L6.2358 6.85795H6.16761L3.69602 14ZM3.9304 10.5824H8.46449V11.6903H3.9304V10.5824ZM13.1637 14.1449C12.7489 14.1449 12.3739 14.0682 12.0387 13.9148C11.7035 13.7585 11.4379 13.5327 11.2418 13.2372C11.0487 12.9418 10.9521 12.5795 10.9521 12.1506C10.9521 11.7812 11.0231 11.4773 11.1651 11.2386C11.3072 11 11.4989 10.8111 11.7404 10.6719C11.9819 10.5327 12.2518 10.4276 12.5501 10.3565C12.8484 10.2855 13.1523 10.2315 13.462 10.1946C13.854 10.1491 14.1722 10.1122 14.4165 10.0838C14.6609 10.0526 14.8384 10.0028 14.9492 9.93466C15.06 9.86648 15.1154 9.75568 15.1154 9.60227V9.57244C15.1154 9.20028 15.0103 8.91193 14.8001 8.70739C14.5927 8.50284 14.283 8.40057 13.8711 8.40057C13.4421 8.40057 13.104 8.49574 12.8569 8.68608C12.6126 8.87358 12.4435 9.08239 12.3498 9.3125L11.1523 9.03977C11.2944 8.64205 11.5018 8.32102 11.7745 8.0767C12.0501 7.82955 12.3668 7.65057 12.7248 7.53977C13.0827 7.42614 13.4592 7.36932 13.854 7.36932C14.1154 7.36932 14.3924 7.40057 14.685 7.46307C14.9805 7.52273 15.256 7.63352 15.5117 7.79545C15.7702 7.95739 15.9819 8.18892 16.1467 8.49006C16.3114 8.78835 16.3938 9.17614 16.3938 9.65341V14H15.1495V13.1051H15.0984C15.016 13.2699 14.8924 13.4318 14.7276 13.5909C14.5629 13.75 14.3512 13.8821 14.0927 13.9872C13.8342 14.0923 13.5245 14.1449 13.1637 14.1449ZM13.4407 13.1222C13.793 13.1222 14.0941 13.0526 14.3441 12.9134C14.5969 12.7741 14.7887 12.5923 14.9194 12.3679C15.0529 12.1406 15.1197 11.8977 15.1197 11.6392V10.7955C15.0742 10.8409 14.9862 10.8835 14.8555 10.9233C14.7276 10.9602 14.5813 10.9929 14.4165 11.0213C14.2518 11.0469 14.0913 11.071 13.935 11.0938C13.7788 11.1136 13.6481 11.1307 13.543 11.1449C13.2958 11.1761 13.07 11.2287 12.8654 11.3026C12.6637 11.3764 12.5018 11.483 12.3796 11.6222C12.2603 11.7585 12.2006 11.9403 12.2006 12.1676C12.2006 12.483 12.3171 12.7216 12.5501 12.8835C12.783 13.0426 13.0799 13.1222 13.4407 13.1222ZM13.3938 6.58097L14.391 4.61648H15.7333L14.4123 6.58097H13.3938Z" /></svg>`;
+
+
 
     const voiceRecBtn = document.createElement("div");
     voiceRecBtn.title = "Voice Search";
@@ -291,7 +330,8 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
 
     });
 
-    inputContainer.append(input, matchCaseBtn, matchWholeBtn, voiceRecBtn);
+
+    inputContainer.append(input, matchDiacriticsBtn, matchCaseBtn, matchWholeBtn, voiceRecBtn);
 
     // Toolbar
     const toolbar = document.createElement("div");
@@ -430,9 +470,10 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     modes.className = "modes";
 
     // Helper function for checkboxes
-    function createCheckbox(parent, wrapperClass, labelClass, labelText, inputName, isChecked, onChange) {
+    function createCheckbox(parent, wrapperClass, labelClass, labelText, inputName, toolTip, isChecked, onChange) {
         const wrapper = document.createElement("div");
         wrapper.className = wrapperClass;
+        wrapper.title = toolTip;
 
         const nameDiv = document.createElement("div");
         nameDiv.className = labelClass;
@@ -450,25 +491,29 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     }
 
     // Add Area Tags
-    createCheckbox(areaTags, "tag", "tag-name", "Main", "", uiStates.searchArea.main, (e) => uiStates.searchArea.main = e.target.checked);
-    createCheckbox(areaTags, "tag", "tag-name", "Nav", "", uiStates.searchArea.nav, (e) => uiStates.searchArea.nav = e.target.checked);
-    createCheckbox(areaTags, "tag", "tag-name", "Code", "", uiStates.searchArea.code, (e) => uiStates.searchArea.code = e.target.checked);
+    createCheckbox(areaTags, "tag", "tag-name", "Main", "", "Searches the main body content.", uiStates.searchArea.main, (e) => uiStates.searchArea.main = e.target.checked);
+    createCheckbox(areaTags, "tag", "tag-name", "Nav", "", "Searches in menus and navigations.", uiStates.searchArea.nav, (e) => uiStates.searchArea.nav = e.target.checked);
+
+
+    if (isDev) {
+        createCheckbox(areaTags, "tag", "tag-name", "Code", "", "Searches in the Code blocks.", uiStates.searchArea.code, (e) => uiStates.searchArea.code = e.target.checked);
+    }
 
     // Add Modes
     const modeConfigs = [
-        { name: "normal", label: "Normal" },
-        { name: "regex", label: "RegEx" },
-        { name: "fuzzy", label: "Fuzzy" },
-        { name: "semantic", label: "Semantic" },
-        { name: "phonetic", label: "Phonetic" }
+        { name: "normal", label: "Exact", toolTip: "Finds the exact word or phrase." },
+        { name: "regex", label: "Pattern", toolTip: "RegEx Matching" },
+        { name: "fuzzy", label: "Partial", toolTip: "Typo-tolerant Matching" },
+        { name: "semantic", label: "Meaning", toolTip: "Matches similar context or meaning." },
+        { name: "phonetic", label: "Sounds like", toolTip: "Matches similar sounding words." }
     ];
 
     const modeCheckboxes = modeConfigs.map(config => {
-        return createCheckbox(modes, "mode", "mode-name", config.label, config.name, uiStates[config.name]);
+        return createCheckbox(modes, "mode", "mode-name", config.label, config.name, config.toolTip, uiStates[config.name]);
     });
 
     modesContainer.append(areaTags, modes);
-    container.append(searchPanel, modesContainer);
+    container.append(searchPanel, modesContainer, iteratorPane);
     shadowRoot.appendChild(container);
     body.prepend(host);
 
@@ -502,6 +547,11 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     matchWholeBtn.addEventListener("click", (e) => {
         uiStates.matchWhole = !uiStates.matchWhole;
         e.currentTarget.classList.toggle("active", uiStates.matchWhole);
+    });
+
+    matchDiacriticsBtn.addEventListener("click", (e) => {
+        uiStates.matchDiacritics = !uiStates.matchDiacritics;
+        e.currentTarget.classList.toggle("active", uiStates.matchDiacritics);
     });
 
     const expandBtnSvg = expandBtn.querySelector("svg");
@@ -541,12 +591,18 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
     function refreshUi() {
 
         if (uiStates.normal) {
+            matchDiacriticsBtn.style.display = "flex";
             matchCaseBtn.style.display = "flex";
             matchWholeBtn.style.display = "flex";
         }
         else {
+            matchDiacriticsBtn.style.display = "none";
             matchCaseBtn.style.display = "none";
             matchWholeBtn.style.display = "none";
+        }
+
+        if (!showMatchDiacritics) {
+            matchDiacriticsBtn.style.display = "none";
         }
 
         if (uiStates.phonetic) {
@@ -555,6 +611,8 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
         else {
             voiceRecBtn.style.display = "none";
         }
+
+
     }
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -571,8 +629,9 @@ export function setupContainer(parserOptions, normalizerOptions, matcherOptions,
         }
     });
 
+    refreshUi();
 
-    return { input, container, shadowRoot, host };
+    return { input, container, shadowRoot, host, iteratorPane };
 }
 
 
