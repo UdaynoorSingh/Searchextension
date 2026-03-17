@@ -34,15 +34,16 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
         matchWhole: false,
         matchDiacritics: false,
         searchArea: {
-            main: true,
-            nav: true,
-            code: true
+            main: false,
+            nav: false,
+            code: false
         },
-        normal: true,
+        normal: false,
         phonetic: false,
         regex: false,
         fuzzy: false
     };
+
 
     // 1. Proxy the nested searchArea object
     uiStates.searchArea = new Proxy(uiStates.searchArea, {
@@ -54,6 +55,10 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             // Map searchArea properties to parserOptions
             const parserMap = { main: 'includeMain', nav: 'includeNav', code: 'includeCode' };
             if (parserMap[prop]) parserOptions[parserMap[prop]] = value;
+
+            if (prop === "main") chrome.storage.local.set({ lastMain: value });
+            else if (prop === "nav") chrome.storage.local.set({ lastNav: value });
+            else if (prop === "code") chrome.storage.local.set({ lastCode: value });
 
 
             search(input.value);
@@ -72,16 +77,20 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             // Map boolean toggles
             if (prop === 'matchCase') {
                 normalizerOptions.caseInsensitive = !value
+
+                chrome.storage.local.set({ lastMatchCase: value });
                 search(input.value);
             };
 
             if (prop === 'matchWhole') {
                 matcherOptions.matchWhole = value
+                chrome.storage.local.set({ lastMatchWhole: value });
                 search(input.value);
             };
 
             if (prop === 'matchDiacritics') {
                 normalizerOptions.matchDiacritics = value
+                chrome.storage.local.set({ lastMatchDiacritics: value });
                 search(input.value);
             };
 
@@ -100,6 +109,9 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             if (searchTypeMap[prop]) {
                 // ? This all comes under if value === true other wise it would have caused 6 search statements when chechbox.foreach logic would have ran
                 if (value === true) {
+
+                    chrome.storage.local.set({ lastMode: prop });
+
                     const inputVal = input.value;
                     matcherOptions.matchType = searchTypeMap[prop];
                     // ? When the user changes the mode the input should get refocused
@@ -147,6 +159,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
         }
     });
 
+
     // 1. Create Main Container
     const container = document.createElement("div");
     container.className = "search-container";
@@ -186,11 +199,18 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     input.type = "text";
     input.className = "input";
 
+
+    const lastMatchCase = await getPreference("lastMatchCase");
+    const lastMatchWhole = await getPreference("lastMatchWhole");
+    const lastMatchDiacritics = await getPreference("lastMatchDiacritics");
+
+
     const matchCaseBtn = document.createElement("div");
     matchCaseBtn.title = "Match Case";
     matchCaseBtn.className = "input-btn";
     matchCaseBtn.id = "match-case-btn";
     matchCaseBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="#c1c1d2" d="m3.975 17l3.75-10h1.8l3.75 10H11.55l-.9-2.55H6.6L5.7 17H3.975Zm3.15-4h3l-1.45-4.15h-.1L7.125 13Zm9.225 4.275q-1.225 0-1.925-.638t-.7-1.737q0-1.05.813-1.713t2.087-.662q.575 0 1.063.088t.837.287v-.35q0-.675-.462-1.075t-1.263-.4q-.525 0-.988.225t-.787.65l-1.075-.8q.475-.675 1.2-1.025t1.675-.35q1.55 0 2.375.738t.825 2.137v4.4H18.55v-.85h-.075q-.325.5-.875.788t-1.25.287Zm.25-1.25q.8 0 1.363-.563t.562-1.362q-.35-.2-.8-.3t-.825-.1q-.8 0-1.225.313t-.425.887q0 .5.375.813t.975.312Z" /></svg>`;
+
 
     const matchWholeBtn = document.createElement("div");
     matchWholeBtn.title = "Match Whole Word";
@@ -199,8 +219,8 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     matchWholeBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="#c1c1d2" d="M3 19.025q-.825 0-1.413-.587T1 17.025v-2q0-.425.288-.712T2 14.025q.425 0 .713.288t.287.712v2h18v-2q0-.425.288-.713t.712-.287q.425 0 .713.288t.287.712v2q0 .825-.588 1.413T21 19.024H3Zm4.35-3.8q-1.225 0-1.925-.637t-.7-1.738q0-1.05.813-1.712t2.087-.663q.575 0 1.063.088t.837.287v-.35q0-.675-.463-1.075t-1.262-.4q-.375 0-.712.113t-.613.312q-.225.175-.487.2T5.5 9.5q-.225-.175-.275-.438t.15-.462q.45-.425 1.063-.65t1.387-.225q1.55 0 2.375.738t.825 2.137v3.675q0 .3-.213.513T10.3 15q-.325 0-.537-.213t-.213-.537v-.1h-.075q-.325.5-.875.788t-1.25.287Zm.55-3.575q-.8 0-1.225.313t-.425.887q0 .5.375.813t.975.312q.8 0 1.363-.562t.562-1.363q-.35-.2-.8-.3t-.825-.1Zm8.425 3.575q-1.025 0-1.562-.45t-.688-.7H14v.325q0 .3-.212.513t-.513.212q-.3 0-.525-.225t-.225-.525V5.75q0-.325.225-.55t.55-.225q.325 0 .55.225t.225.55V7.8L14 8.8h.075q.075-.125.6-.638t1.65-.512q1.6 0 2.525 1.15t.925 2.65q0 1.5-.912 2.638t-2.538 1.137ZM16.1 9.05q-1 0-1.55.738T14 11.425q0 .925.55 1.65t1.55.725q1 0 1.563-.725t.562-1.65q0-.925-.563-1.65T16.1 9.05Z" /></svg>`;
 
 
+
     const showMatchDiacritics = await getPreference("showMatchDiacritics");
-    console.log(showMatchDiacritics);
 
     const matchDiacriticsBtn = document.createElement("div");
     matchDiacriticsBtn.title = "Match Diacritics";
@@ -467,6 +487,22 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     const modes = document.createElement("div");
     modes.className = "modes";
 
+
+    // ? Setting last mode
+    const lastMode = await getPreference("lastMode");
+    uiStates[lastMode] = true;
+
+    const lastNav = await getPreference("lastNav");
+    uiStates.searchArea.nav = lastNav;
+
+    const lastMain = await getPreference("lastMain");
+    uiStates.searchArea.main = lastMain;
+
+    const lastCode = await getPreference("lastCode");
+    uiStates.searchArea.code = lastCode;
+
+
+
     // Helper function for checkboxes
     function createCheckbox(parent, wrapperClass, labelClass, labelText, inputName, toolTip, isChecked, onChange) {
         const wrapper = document.createElement("div");
@@ -537,7 +573,9 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     });
 
     matchCaseBtn.addEventListener("click", (e) => {
+
         uiStates.matchCase = !uiStates.matchCase;
+        console.log("new ui state ", uiStates.matchCase);
         e.currentTarget.classList.toggle("active", uiStates.matchCase);
     });
 
@@ -561,6 +599,8 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     });
 
 
+
+
     modeCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('click', (e) => {
             if (uiStates[checkbox.name]) {
@@ -582,6 +622,23 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             uiStates[checkbox.name] = true;
         });
     });
+
+
+    // ? IDK why but there seems to be some depandancy error that causes references to go undefine when these try to change value and PROXY runs set
+    if (lastMatchCase) {
+        matchCaseBtn.classList.toggle("active", true);
+        uiStates.matchCase = true;
+    }
+
+    if (lastMatchWhole) {
+        matchWholeBtn.classList.toggle("active", true);
+        uiStates.matchWhole = true;
+    }
+
+    if (lastMatchDiacritics) {
+        matchDiacriticsBtn.classList.toggle("active", true);
+        uiStates.matchDiacritics = true;
+    }
 
 
     // ? Only goes for input buttons and search button states
@@ -625,6 +682,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             }
         }
     });
+
 
     refreshUi();
 

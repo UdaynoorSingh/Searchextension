@@ -7,4 +7,14 @@ export const DEFAULT_SETTINGS = {
     langDialect: "en-US",
     showMatchDiacritics: false,
     scrollSnap: false,
+    lastMode: "normal",
+
+    lastNav: true,
+    lastMain:true,
+    lastCode:true,
+
+    lastMatchCase: true,
+    lastMatchWhole:true,
+    lastMatchDiacritics:true,
+
 };

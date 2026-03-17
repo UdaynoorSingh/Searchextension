@@ -15,7 +15,6 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     if (command === "search-current-page" && extensionOn) {
         chrome.tabs.sendMessage(tab.id, { target: "tab", action: "search-current-page" });
     }
-
     // ! Add action listen cmd as well for fallback
 });
 
@@ -27,13 +26,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.target === 'background') {
         switch (message.action) {
             case "show-error-delegation":
-
                 if (message.delegateTo === "tab") {
                     chrome.tabs.sendMessage(message.oriSenderId, { target: "tab", action: "show-error", error: message.error });
                 }
-
                 break;
-
 
             default:
                 break;

@@ -70,9 +70,6 @@ async function search(query) {
                 nodeObjs.push({ node: nodes[i], normalizedTextContent, matches: [] });
             }
 
-
-
-
             for (let i = 0; i < nodeObjs.length; i++) {
                 nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
             }
@@ -85,7 +82,6 @@ async function search(query) {
 
             for (let i = 0; i < nodeObjs.length; i++) {
                 // ? For performance issues this is here 
-                // ? We may as well put this in parser for semantic search
                 if (!Parser.isNodeVisible(nodeObjs[i].node)) continue;
 
                 for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {
