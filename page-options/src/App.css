@@ -1,0 +1,116 @@
+.options-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 40px 20px;
+}
+
+.options-card {
+  background-color: var(--gothic-darkest);
+  border: var(--border-thickness) solid var(--gothic-darker);
+  border-radius: var(--border-radius);
+  padding: 40px 50px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.options-header {
+  margin-bottom: 30px;
+  border-bottom: 2px solid var(--gothic-darker);
+  padding-bottom: 20px;
+}
+
+.options-header h2 {
+  font-size: 28px;
+  color: var(--gothic-white);
+  margin-bottom: 10px;
+}
+
+.options-header p {
+  color: var(--gothic-lightest);
+  font-size: 16px;
+}
+
+.options-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--gothic-darker);
+  gap: 20px;
+}
+
+/* Remove bottom border from the last item */
+.setting-row:last-child {
+  border-bottom: none;
+}
+
+.setting-info {
+  flex-grow: 1;
+}
+
+.setting-info h3 {
+  font-size: 16px;
+  color: var(--gothic-white);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.setting-info p {
+  font-size: 14px;
+  color: var(--gothic-light);
+  line-height: 1.4;
+}
+
+.select-dropdown {
+  padding: 10px 15px;
+  background-color: var(--gothic-darker);
+  color: var(--gothic-white);
+  border: var(--border-thickness) solid var(--gothic-dark);
+  border-radius: var(--button-border-radius);
+  font-size: 15px;
+  cursor: pointer;
+  outline: none;
+  min-width: 200px;
+}
+
+/* Make Yes/No dropdowns slightly narrower than the Accent list */
+.select-dropdown.narrow {
+  min-width: 120px;
+}
+
+.select-dropdown:focus {
+  border-color: var(--gothic-light);
+}
+
+.options-footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 2px solid var(--gothic-darker);
+}
+
+.btn {
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--button-border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn.primary {
+  background-color: var(--gothic-light);
+  color: var(--gothic-black);
+  border: var(--border-thickness) solid transparent;
+}
+
+.btn.primary:hover {
+  background-color: var(--gothic-white);
+}

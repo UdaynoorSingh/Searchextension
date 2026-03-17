@@ -1,0 +1,207 @@
+.boarding-container {
+  width: 1000px;
+  max-width: 750px; 
+  padding: 20px;
+}
+
+.boarding-card {
+background-color: var(--gothic-darkest);
+  border: var(--border-thickness) solid var(--gothic-darker);
+  border-radius: var(--border-radius);
+  padding: 50px; 
+  height: 600px; 
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%
+}
+
+.content-body {
+ flex-grow: 1; 
+  overflow-y: auto; 
+  scrollbar-width: 0px;
+  padding-right: 10px;
+}
+
+.step-content h2 {
+  font-size: 28px;
+  color: var(--gothic-white);
+  margin-bottom: 16px;
+}
+
+.step-content p {
+  color: var(--gothic-lightest);
+  margin-bottom: 35px;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background-color: var(--gothic-darker);
+  border: var(--border-thickness) solid var(--gothic-dark);
+  border-radius: var(--button-border-radius);
+  cursor: pointer;
+  margin-bottom: 40px;
+  transition: border-color 0.2s ease;
+}
+
+.checkbox-label:hover {
+  border-color: var(--gothic-light);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--gothic-light);
+}
+
+.checkbox-label span {
+  color: var(--gothic-lighter);
+  font-size: 16px;
+}
+
+.checkbox-label a {
+  color: var(--gothic-white);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.checkbox-label a:hover {
+  color: var(--gothic-lightest);
+}
+
+.select-input {
+  width: 100%;
+  padding: 15px;
+  background-color: var(--gothic-darker);
+  color: var(--gothic-white);
+  border: var(--border-thickness) solid var(--gothic-dark);
+  border-radius: var(--button-border-radius);
+  margin-bottom: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+}
+
+.select-input:focus {
+  border-color: var(--gothic-light);
+}
+
+.actions {
+  display: flex;
+  margin-top: 30px;
+}
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+.gap-15 {
+  gap: 15px;
+}
+
+.btn {
+  padding: 12px 28px; 
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--button-border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background-color: var(--gothic-light);
+  color: var(--gothic-black);
+  border: var(--border-thickness) solid transparent;
+}
+
+.btn.primary:not(:disabled):hover {
+  background-color: var(--gothic-white);
+}
+
+.btn.secondary {
+  background-color: transparent;
+  color: var(--gothic-lightest);
+  border: var(--border-thickness) solid var(--gothic-dark);
+}
+
+.btn.secondary:hover {
+  background-color: var(--gothic-darker);
+  color: var(--gothic-white);
+}
+
+.btn.finish {
+  background-color: var(--gothic-white);
+  color: var(--gothic-black);
+  border: var(--border-thickness) solid transparent;
+}
+
+.btn.finish:hover {
+  background-color: #ffffff;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.dropdown-spacer {
+  padding-bottom: 120px; 
+}
+
+.text-center {
+  text-align: center;
+}
+
+.final-text a {
+  color: var(--gothic-white);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+
+.final-text a:hover {
+  color: var(--gothic-lightest);
+}
+
+.image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 25px;
+}
+
+.aspect-ratio-image {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 16 / 9; 
+  object-fit: cover;
+  border-radius: var(--border-radius);
+  border: var(--border-thickness) solid var(--gothic-dark);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}

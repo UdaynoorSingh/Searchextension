@@ -1,0 +1,37 @@
+:root {
+    --gothic-black: #0e0e12;
+    --gothic-darkest: #1a1a24;
+    --gothic-darker: #333346;
+    --gothic-dark: #535373;
+    --gothic-dark-faded: rgba(83, 83, 115, 0.5);
+    --gothic-light: #8080a4;
+    --gothic-light-faded: rgba(128, 128, 164, 0.5);
+    --gothic-lighter: #a6a6bf;
+    --gothic-lightest: #c1c1d2;
+    --gothic-white: #e6e6ec;
+    --border-thickness : 2px;
+    --border-radius: 8px;
+    --button-border-radius: 4px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  background-color: var(--gothic-black);
+  color: var(--gothic-white);
+  font-family: system-ui, -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+input, button, textarea, select {
+  font: inherit;
+}
