@@ -69,24 +69,20 @@ export function stopDynamicSearch() {
 
 async function processDynamicNodes(newTextNodes, query, matcherOptions, normalizerOptions, signal) {
     if (signal.aborted) return;
-    
+
     const nodeObjs = [];
-    
+
     for (let i = 0; i < newTextNodes.length; i++) {
 
         const normalizedTextContent = Normalizer.normalize(newTextNodes[i].textContent, normalizerOptions);
         nodeObjs.push({ node: newTextNodes[i], normalizedTextContent, matches: [] });
     }
-    
-    if (matcherOptions.matchType === "semantic") {
-        
-        if (signal.aborted) return;
+
+
+    for (let i = 0; i < nodeObjs.length; i++) {
+        nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
     }
-    else {
-        for (let i = 0; i < nodeObjs.length; i++) {
-            nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
-        }
-    }
+
 
     // ! need to add logic for matcher
 

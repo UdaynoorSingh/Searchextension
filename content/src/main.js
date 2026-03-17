@@ -19,14 +19,14 @@ let iteratorPane = null;
 let controller = null;
 
 let lastQuery = null;
-let optionsChangedObj = { optionsChanged : false };
+let optionsChangedObj = { optionsChanged: false };
 
 
 
 // ! Remember if you add a new object here and in uiStates you have to bridge them by proxy in uiStates
 export const normalizerOptions = { matchDiacritics: false, caseInsensitive: true };
 export const parserOptions = { includeMain: true, includeNav: true, includeCode: true };
-// ? possible searchTypes "Exact", "RegEx", "Semantic", "Fuzzy", "Phonetic" 
+// ? possible searchTypes "Exact", "RegEx", "Fuzzy", "Phonetic" 
 export const matcherOptions = { matchType: "Exact", matchWhole: false }
 
 
@@ -71,42 +71,12 @@ async function search(query) {
             }
 
 
-            if (matcherOptions.matchType === "Semantic") {
-                const nodeChunksObjs = [];
-                for (let i = 0; i < nodeObjs.length; i++) {
-                    const chunks = Utils.splitReadableContent(nodeObjs[i].normalizedTextContent);
-                    nodeObjs[i].chunks = chunks;
-
-                    nodeChunksObjs.push({ nodeIndex: i, chunks });
-                }
-
-                await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-embed-content", nodeChunksObjs, url: Utils.getCacheKeyUrl(window.location.href) });
-                if (signal.aborted) return;
 
 
-                const allMatches = await chrome.runtime.sendMessage({ target: "background", action: "semantic-search-query", query: query });
-                if (signal.aborted) return;
-
-                for (let i = 0; i < allMatches.length; i++) {
-                    const nodeIndex = allMatches[i].nodeIndex;
-
-                    for (let j = 0; j < allMatches[i].chunkIndices.length; j++) {
-                        let startIndex = 0;
-
-                        for (let k = 0; k < allMatches[i].chunkIndices[j]; k++) {
-                            startIndex += nodeObjs[nodeIndex].chunks[k].length;
-                        }
-                        let matchLength = nodeObjs[nodeIndex].chunks[j].length;
-                        nodeObjs[nodeIndex].matches.push({ startIndex, matchLength });
-                    }
-                }
-
+            for (let i = 0; i < nodeObjs.length; i++) {
+                nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
             }
-            else {
-                for (let i = 0; i < nodeObjs.length; i++) {
-                    nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
-                }
-            }
+
 
             // ? Remember the if the user presses or changes the search query then if this is running it is not going to stop
             // ? It will registar the new search but it will strictly wait for this to end as no await is being used after this line

@@ -39,7 +39,6 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             code: true
         },
         normal: true,
-        semantic: false,
         phonetic: false,
         regex: false,
         fuzzy: false
@@ -92,7 +91,6 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             const searchTypeMap = {
                 normal: "Exact",
                 regex: "RegEx",
-                semantic: "Semantic",
                 fuzzy: "Fuzzy",
                 phonetic: "Phonetic"
             };
@@ -504,7 +502,6 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
         { name: "normal", label: "Exact", toolTip: "Finds the exact word or phrase." },
         { name: "regex", label: "Pattern", toolTip: "RegEx Matching" },
         { name: "fuzzy", label: "Partial", toolTip: "Typo-tolerant Matching" },
-        { name: "semantic", label: "Meaning", toolTip: "Matches similar context or meaning." },
         { name: "phonetic", label: "Sounds like", toolTip: "Matches similar sounding words." }
     ];
 

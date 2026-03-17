@@ -3,13 +3,12 @@
     "name": "Majo - Smartest Ctrl+F, Find in page search",
     "short_name": "Majo Search",
     "version": "1.0.0",
-    "version_name": "Magic 1.0",
-    
-    "minimum_chrome_version": "102",
-    "description": "A brief, plain text summary of the extension's purpose.",
+    "version_name": "Magic 0",
+    "description": "Replace Ctrl+F with advanced find-in-page features like regex, typo-tolerance, sound-alike matching, and contextual meaning.",
     "action": {
-        "default_title": "Click Me!"
+        "default_title": "Search"
     },
+    
     "background": {
         "service_worker": "./background/dist/background.js",
         "type": "module"
