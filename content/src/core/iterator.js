@@ -1,4 +1,5 @@
 import { getPreference } from "../_lib/utils.js";
+import * as Constants from "../_lib/constants.js"
 
 let index = null;
 // ? prevIndex exists solely for removing prev highlights
@@ -11,9 +12,12 @@ let iteratorPaneInput = null;
 let iteratorPaneResult = null;
 
 let scrollSnap = false;
+let theme = "standard";
+
 
 (async () => {
     scrollSnap = await getPreference("scrollSnap");
+    theme = await getPreference("theme");
 })();
 
 
@@ -99,12 +103,14 @@ export function previous() {
 function onIndexChange() {
 
     if (prevIndex !== null && nodes[prevIndex]) {
-        nodes[prevIndex].style.backgroundColor = 'lightblue';
+        nodes[prevIndex].style.backgroundColor = Constants.themes[theme]["highlightBg"];
+        nodes[prevIndex].style.color = Constants.themes[theme]["highlightColor"];
     }
 
     const currentNode = nodes[index];
     if (currentNode) {
-        currentNode.style.backgroundColor = 'orange';
+        currentNode.style.backgroundColor = Constants.themes[theme]["currentBg"];
+        currentNode.style.color = Constants.themes[theme]["currentColor"];
 
         if (scrollSnap) {
             currentNode.scrollIntoView({

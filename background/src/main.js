@@ -3,20 +3,51 @@ import "./core/install.js";
 import "./core/rating.js";
 import "./core/contextMenu.js";
 
-import { getPreference } from "./_lib/utils.js";
-
+import { getPreference, isBoardingPage, validateTabAndNotify } from "./_lib/utils.js";
 
 
 
 // ! need to add logic where you check tab type and url and based on that take action
-chrome.commands.onCommand.addListener(async (command, tab) => {
+chrome.commands.onCommand.addListener((command, tab) => {
+    if (command === "search-current-page") {
+        onSearchCurrentPageCmd(tab);
+    }
+});
+
+
+chrome.action.onClicked.addListener((tab) => {
+    onSearchCurrentPageCmd(tab);
+});
+
+
+async function onSearchCurrentPageCmd(tab) {
+
+
+    const hasBoarded = await getPreference("hasBoarded");
+
+    if (await isBoardingPage(tab)) {
+        chrome.tabs.sendMessage(tab.id, { target: "tab", action: "search-current-page" });
+        return;
+    }
+
+    if (!hasBoarded) {
+        chrome.tabs.create({ url: chrome.runtime.getURL("page-boarding/dist/index.html") });
+        return;
+    }
+
+
+
     const extensionOn = await getPreference("extensionOn");
 
-    if (command === "search-current-page" && extensionOn) {
-        chrome.tabs.sendMessage(tab.id, { target: "tab", action: "search-current-page" });
+    if (extensionOn) {
+
+        const validPage = await validateTabAndNotify(tab);
+
+        if (validPage) {
+            chrome.tabs.sendMessage(tab.id, { target: "tab", action: "search-current-page" });
+        }
     }
-    // ! Add action listen cmd as well for fallback
-});
+}
 
 
 
@@ -34,14 +65,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             default:
                 break;
         }
-    }
-});
-
-
-chrome.action.onClicked.addListener(async (tab) => {
-    const extensionOn = await getPreference("extensionOn");
-    if (extensionOn) {
-        chrome.tabs.sendMessage(tab.id, { target: "tab", action: "search-current-page" });
     }
 });
 

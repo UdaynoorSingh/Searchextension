@@ -62,7 +62,7 @@ input[type="checkbox"]:checked::after {
     /* padding: 5px 5px 5px 0; */
     background-color: var(--gothic-darker);
     z-index: 2147483647;
-
+    font-size: 16px;
     top: 5%;
     left: 60%;
     /*box-shadow: h-offset v-offset blur-radius spread-radius color inset; */
@@ -256,7 +256,9 @@ input[type="checkbox"]:checked::after {
 .modes-container {
     position: absolute;
     top: 5px;
-    height: 0px;
+    height: fit-content;
+    max-height: 0px;
+
     width: 100%;
     display: flex;
 
@@ -272,7 +274,7 @@ input[type="checkbox"]:checked::after {
     user-select: none;
 
     transition: top 0.3s ease-in-out,
-        height 0.3s ease-in-out;
+        max-height 0.3s ease-in-out;
     overflow: hidden;
     /* box-shadow: 0 0 10px 0 var(--gothic-dark-faded); */
 
@@ -281,7 +283,7 @@ input[type="checkbox"]:checked::after {
 .modes-container.opened {
     top: 60px;
     /* ! Hard coded height that would be obtained on fit-content */
-    height: 180px;
+    max-height: 300px;
 }
 
 .area-tags {

@@ -1,0 +1,72 @@
+.playground-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 100px;
+    gap: 35px;
+}
+
+.playground-card {
+    background-color: var(--gothic-darkest);
+    border: var(--border-thickness) solid var(--gothic-darker);
+    border-radius: var(--border-radius);
+    padding: 60px 50px;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+}
+
+.playground-title {
+    font-size: 42px;
+    color: var(--gothic-white);
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.playground-subtitle {
+    font-size: 18px;
+    color: var(--gothic-lighter);
+    text-align: center;
+    line-height: 1.6;
+}
+
+.playground-subtitle a {
+    color: var(--gothic-white);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.playground-subtitle a:hover {
+    color: var(--gothic-lightest);
+}
+
+.playground-instructions {
+    background-color: var(--gothic-darker);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    border: var(--border-thickness) solid var(--gothic-dark);
+    font-size: 18px;
+}
+
+.playground-instructions ul {
+    margin-top: 15px;
+    padding-left: 25px;
+    color: var(--gothic-lightest);
+    line-height: 1.8;
+}
+
+.playground-text-box {
+    padding: 40px;
+    border: var(--border-thickness) solid var(--gothic-dark);
+    border-radius: var(--border-radius);
+    color: var(--gothic-white);
+    background-color: var(--gothic-black);
+    font-size: 20px;
+    line-height: 1.8;
+}

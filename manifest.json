@@ -5,20 +5,30 @@
     "version": "1.0.0",
     "version_name": "Magic 0",
     "description": "Replace Ctrl+F with advanced find-in-page features like regex, typo-tolerance, sound-alike matching, and contextual meaning.",
-    "action": {
-        "default_title": "Search"
+    "icons": {
+        "16": "assets/16.png",
+        "32": "assets/32.png",
+        "48": "assets/48.png",
+        "128": "assets/128.png"
     },
-    
+    "action": {
+        "default_title": "Search in current page",
+        "default_icon": {
+            "16": "assets/16.png",
+            "24": "assets/24.png",
+            "32": "assets/32.png"
+        }
+    },
     "background": {
         "service_worker": "./background/dist/background.js",
         "type": "module"
     },
     "permissions": [
         "storage",
-        "unlimitedStorage",
         "notifications",
         "alarms",
-        "contextMenus"
+        "contextMenus",
+        "tabs"
     ],
     "web_accessible_resources": [
         {

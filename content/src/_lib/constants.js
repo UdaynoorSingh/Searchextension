@@ -32,7 +32,7 @@ export const DEFAULT_SETTINGS = {
     showMatchDiacritics: false,
     scrollSnap: false,
     lastMode: "normal",
-    
+
     lastNav: true,
     lastMain: true,
     lastCode: true,
@@ -45,6 +45,27 @@ export const DEFAULT_SETTINGS = {
 
 export const HIGHLIGHTED_EL_CLASSNAME = "search-ext-highlight";
 export const HIGHLIGHTED_EL_TAGNAME = "MARK";
+
+export const themes = {
+    standard: {
+        highlightBg: '#ffff00',
+        highlightColor: '#000000',
+        currentBg: '#ff9632',
+        currentColor: '#000000'
+    },
+    modern: {
+        highlightBg: '#a8d1ff',
+        highlightColor: '#000000',
+        currentBg: '#005a9e',
+        currentColor: '#ffffff'
+    },
+    highContrast: {
+        highlightBg: '#b5e853',
+        highlightColor: '#000000',
+        currentBg: '#7a22cc',
+        currentColor: '#ffffff'
+    }
+};
 
 export const SEARCH_STATES = {
     idle: 1,

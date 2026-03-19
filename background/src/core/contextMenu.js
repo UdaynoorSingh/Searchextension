@@ -1,6 +1,6 @@
 import { getPreference } from "../_lib/utils";
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
         id: "extension-on-off-ctx-menu",
         title: "Turn Off",
@@ -12,12 +12,27 @@ chrome.runtime.onInstalled.addListener(() => {
         title: "Tips, Tricks and Help",
         contexts: ["action"]
     });
-    
+
     chrome.contextMenus.create({
         id: "thank-you-and-credits-page-ctx-menu",
         title: "Thank you, Credits and a Message",
         contexts: ["action"]
     });
+
+    if (await getPreference("hasBoarded")) {
+        chrome.contextMenus.create({
+            id: "playground-ctx-menu",
+            title: "Playground",
+            contexts: ["action"]
+        });
+    }
+    else {
+        chrome.contextMenus.create({
+            id: "playground-ctx-menu",
+            title: "Boarding Page",
+            contexts: ["action"]
+        });
+    }
 
 });
 
@@ -48,7 +63,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
             chrome.storage.local.set({ extensionOn: !extensionOn });
             break;
-            
+
 
         case "thank-you-and-credits-page-ctx-menu":
             chrome.tabs.create({
@@ -61,6 +76,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 url: chrome.runtime.getURL("page-tips-tricks-and-help/index.html")
             });
             break;
+
+        case "playground-ctx-menu":
+
+            chrome.tabs.create({ url: chrome.runtime.getURL("page-boarding/dist/index.html") });
+            break;
+
+
         default:
             break;
     }

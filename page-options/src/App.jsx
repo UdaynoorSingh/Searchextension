@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 const accents = [
@@ -27,38 +27,71 @@ function App() {
   const [partialMatch, setPartialMatch] = useState('yes');
   const [soundsLike, setSoundsLike] = useState('no');
   const [diacritic, setDiacritic] = useState('no');
+  const [scrollSnap, setScrollSnap] = useState('smooth'); // * alt snap
+  const [theme, setTheme] = useState('standard'); // * alt snap
 
-  const handleSave = () => {
-    const savedOptions = {
-      accent,
-      devMode: devMode === 'yes',
-      regex: regex === 'yes',
-      partialMatch: partialMatch === 'yes',
-      soundsLike: soundsLike === 'yes',
-      diacritic: diacritic === 'yes'
-    };
-    
-    console.log("Saving Preferences:", savedOptions);
-    alert("Your preferences have been saved!");
-    // Later, you will plug in chrome.storage.local.set(savedOptions) here
-  };
+
+
+  useEffect(() => {
+    chrome.storage.local.get([
+      "isDev",
+      "langDialect",
+      "showMatchDiacritics",
+      "showRegexSearch",
+      "showFuzzySearch",
+      "showPhoneticSearch",
+      "scrollSnap",
+      "theme"
+    ], (result) => {
+      if (result.isDev !== undefined) setDevMode(result.isDev);
+      else setDevMode(false)
+      if (result.langDialect !== undefined) setAccent(result.langDialect);
+      else setAccent("en-US");
+      if (result.showMatchDiacritics !== undefined) setDiacritic(result.showMatchDiacritics);
+      else setDiacritic(false);
+      if (result.showRegexSearch !== undefined) setRegex(result.showRegexSearch);
+      else setRegex(false);
+      if (result.showFuzzySearch !== undefined) setPartialMatch(result.showFuzzySearch);
+      else setPartialMatch(true);
+      if (result.showPhoneticSearch !== undefined) setSoundsLike(result.showPhoneticSearch);
+      else setSoundsLike(true);
+      if (result.scrollSnap !== undefined) setScrollSnap(result.scrollSnap);
+      else setScrollSnap(false);
+      if (result.theme !== undefined) setTheme(result.theme);
+      else setTheme("standard");
+    });
+  }, []);
+
+
+  useEffect(() => {
+    chrome.storage.local.set({
+      isDev: devMode,
+      langDialect: accent,
+      showMatchDiacritics: diacritic,
+      scrollSnap: scrollSnap,
+      showRegexSearch: regex,
+      showFuzzySearch: partialMatch,
+      showPhoneticSearch: soundsLike,
+      theme: theme
+    });
+  }, [accent, devMode, regex, partialMatch, soundsLike, diacritic, scrollSnap, theme]);
 
   return (
     <div className="options-container">
       <div className="options-card">
-        
+
         <div className="options-header">
-          <h2>Boarding Options</h2>
-          <p>Customize your Majo Search experience and matching features.</p>
+          <h2>Options</h2>
+          <p>Refresh your open tabs for the changes to take effect there.</p>
         </div>
 
         <div className="options-body">
-          
+
           {/* Accent Row */}
           <div className="setting-row">
             <div className="setting-info">
-              <h3>Voice Accent</h3>
-              <p>Select your primary spoken accent for better phonetic matching.</p>
+              <h3>Voice Search Accent</h3>
+              <p>Select the accent that best matches how you speak.</p>
             </div>
             <select value={accent} onChange={(e) => setAccent(e.target.value)} className="select-dropdown">
               {accents.map((a) => (
@@ -71,9 +104,9 @@ function App() {
           <div className="setting-row">
             <div className="setting-info">
               <h3>Developer Mode</h3>
-              <p>Enable advanced UI areas like code block targeting.</p>
+              <p>Show developer mode options.</p>
             </div>
-            <select value={devMode} onChange={(e) => setDevMode(e.target.value)} className="select-dropdown narrow">
+            <select value={devMode ? "yes" : "no"} onChange={(e) => setDevMode(e.target.value === "no" ? false : true)} className="select-dropdown narrow">
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>
@@ -82,10 +115,10 @@ function App() {
           {/* Regex Matching */}
           <div className="setting-row">
             <div className="setting-info">
-              <h3>RegEx Search</h3>
-              <p>Show Regular Expression search tools by default.</p>
+              <h3>Pattern Matching</h3>
+              <p>Show pattern matching (RegEx Search) tool.</p>
             </div>
-            <select value={regex} onChange={(e) => setRegex(e.target.value)} className="select-dropdown narrow">
+            <select value={regex ? "yes" : "no"} onChange={(e) => setRegex(e.target.value === "no" ? false : true)} className="select-dropdown narrow">
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>
@@ -94,10 +127,10 @@ function App() {
           {/* Partial Matching */}
           <div className="setting-row">
             <div className="setting-info">
-              <h3>Partial Matching (Fuzzy)</h3>
-              <p>Allow searches to match incomplete or slightly misspelled words.</p>
+              <h3>Partial Matching</h3>
+              <p>Show partial matching tool.</p>
             </div>
-            <select value={partialMatch} onChange={(e) => setPartialMatch(e.target.value)} className="select-dropdown narrow">
+            <select value={partialMatch ? "yes" : "no"} onChange={(e) => setPartialMatch(e.target.value === "no" ? false : true)} className="select-dropdown narrow">
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>
@@ -107,9 +140,9 @@ function App() {
           <div className="setting-row">
             <div className="setting-info">
               <h3>Sounds-Like Matching</h3>
-              <p>Match words that are spelled differently but sound the same.</p>
+              <p>show Sounds-Like matching tool.</p>
             </div>
-            <select value={soundsLike} onChange={(e) => setSoundsLike(e.target.value)} className="select-dropdown narrow">
+            <select value={soundsLike ? "yes" : "no"} onChange={(e) => setSoundsLike(e.target.value === "no" ? false : true)} className="select-dropdown narrow">
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>
@@ -119,19 +152,49 @@ function App() {
           <div className="setting-row">
             <div className="setting-info">
               <h3>Diacritic Filtering</h3>
-              <p>Show options to ignore accents and special characters (e.g., é = e).</p>
+              <p>Show option to acknowledge accents and special characters (e.g., é ≠ e).</p>
             </div>
-            <select value={diacritic} onChange={(e) => setDiacritic(e.target.value)} className="select-dropdown narrow">
+            <select value={diacritic ? "yes" : "no"}
+              onChange={(e) =>
+                setDiacritic(e.target.value === "no" ? false : true)}
+              className="select-dropdown narrow">
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>
           </div>
 
+          <div className="setting-row">
+            <div className="setting-info">
+              <h3>Highlight Theme</h3>
+              <p>Theme for highlighting matches should be</p>
+            </div>
+            <select value={theme}
+              onChange={(e) =>
+                setTheme(e.target.value)}
+              className="select-dropdown narrow">
+              <option value="standard">Standard (Orange & Yellow)</option>
+              <option value="modern">Modern (Blue & Lightblue)</option>
+              <option value="highContrast">High Contrast (Lime & Purple)</option>
+            </select>
+          </div>
+
+
+          <div className="setting-row">
+            <div className="setting-info">
+              <h3>Scroll Effect</h3>
+              <p>Scroll effect when moving through result should be</p>
+            </div>
+            <select value={scrollSnap ? "snap" : "smooth"}
+              onChange={(e) =>
+                setScrollSnap(e.target.value === "snap" ? true : false)}
+              className="select-dropdown narrow">
+              <option value="smooth">Smooth</option>
+              <option value="snap">Snap</option>
+            </select>
+          </div>
+
         </div>
 
-        <div className="options-footer">
-          <button className="btn primary" onClick={handleSave}>Save Changes</button>
-        </div>
 
       </div>
     </div>

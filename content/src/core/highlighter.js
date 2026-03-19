@@ -1,5 +1,6 @@
 "use strict";
 import * as Constants from "../_lib/constants.js";
+import { getPreference } from "../_lib/utils.js";
 
 // ? for highlighter to work on matches array the array should be in descending order
 /**
@@ -7,6 +8,13 @@ import * as Constants from "../_lib/constants.js";
 * @param {Number} startIndex
 * @param {Number} matchLength
 */
+let theme = "standard";
+
+(async ()=>{
+    theme = await getPreference("theme");
+})();
+
+
 export function highlightTextNode(textNode, startIndex, matchLength) {
 
     // ? textNode.splitText is going to split node present in DOM into 2 parts
@@ -18,8 +26,8 @@ export function highlightTextNode(textNode, startIndex, matchLength) {
         const highlightEl = document.createElement('mark');
         highlightEl.className = Constants.HIGHLIGHTED_EL_CLASSNAME;
         highlightEl.style.all = 'unset';
-        highlightEl.style.backgroundColor = 'lightblue';
-        highlightEl.style.color = 'black';
+        highlightEl.style.backgroundColor = Constants.themes[theme]["highlightBg"];
+        highlightEl.style.color = Constants.themes[theme]["highlightColor"];
 
         highlightEl.textContent = matchNode.textContent;
         matchNode.parentNode.replaceChild(highlightEl, matchNode);

@@ -113,10 +113,11 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
                     chrome.storage.local.set({ lastMode: prop });
 
                     const inputVal = input.value;
+
                     matcherOptions.matchType = searchTypeMap[prop];
                     // ? When the user changes the mode the input should get refocused
                     input.focus();
-
+                    search(input.value);
 
                     if (searchTypeMap[prop] === "RegEx") {
                         // ? if text is not of the form auto add wrapper
@@ -141,12 +142,10 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
 
                     // ? Stuff like searching should always happen at the end
                     if (searchTypeMap[prop] === "Exact") {
-                        search(inputVal);
                         input.spellcheck = true;
                     }
                     else {
                         // ? searching "" will remove current highlights and also stop current on going query
-                        search("");
                         input.spellcheck = false;
                     }
                 }
@@ -276,7 +275,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             recognition.onresult = (event) => {
                 const result = event.results[0][0].transcript;
                 input.value = result;
-
+                search(input.value);
             };
 
             recognition.onerror = (event) => {
@@ -343,8 +342,8 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
         else {
             // ? When you are not in normal search mode then changing input should clear current highlights
             regexAutoSetted = false;
-            search("");
         }
+        search(input.value);
 
     });
 
@@ -492,6 +491,10 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     const lastMode = await getPreference("lastMode");
     uiStates[lastMode] = true;
 
+    if (lastMode === "regex" && !showRegexSearch) uiStates["normal"] = true;
+    else if (lastMode === "fuzzy" && !showFuzzySearch) uiStates["normal"] = true;
+    else if (lastMode === "phonetic" && !showPhoneticSearch) uiStates["normal"] = true;
+
     const lastNav = await getPreference("lastNav");
     uiStates.searchArea.nav = lastNav;
 
@@ -535,11 +538,26 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
 
     // Add Modes
     const modeConfigs = [
-        { name: "normal", label: "Exact", toolTip: "Finds the exact word or phrase." },
-        { name: "regex", label: "Pattern", toolTip: "RegEx Matching" },
-        { name: "fuzzy", label: "Partial", toolTip: "Typo-tolerant Matching" },
-        { name: "phonetic", label: "Sounds like", toolTip: "Matches similar sounding words." }
+        { name: "normal", label: "Exact", toolTip: "Finds the exact word or phrase." }
     ];
+
+    const showRegexSearch = await getPreference("showRegexSearch");
+    const showFuzzySearch = await getPreference("showFuzzySearch");
+    const showPhoneticSearch = await getPreference("showPhoneticSearch");
+
+    if (showRegexSearch) {
+        modeConfigs.push({ name: "regex", label: "Pattern", toolTip: "RegEx Matching" });
+    }
+    if (showFuzzySearch) {
+        modeConfigs.push({ name: "fuzzy", label: "Partial", toolTip: "Typo-tolerant Matching" });
+    }
+    if (showPhoneticSearch) {
+        modeConfigs.push({ name: "phonetic", label: "Sounds-like", toolTip: "Matches similar sounding words." });
+    }
+
+    if (lastMode === "regex" && !showRegexSearch) {
+
+    }
 
     const modeCheckboxes = modeConfigs.map(config => {
         return createCheckbox(modes, "mode", "mode-name", config.label, config.name, config.toolTip, uiStates[config.name]);

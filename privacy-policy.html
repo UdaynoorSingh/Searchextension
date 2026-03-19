@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy | Majo Search</title>
+<style>
+  :root {
+    --gothic-black: #0e0e12;
+    --gothic-darkest: #1a1a24;
+    --gothic-darker: #333346;
+    --gothic-dark: #535373;
+    --gothic-light: #8080a4;
+    --gothic-lighter: #a6a6bf;
+    --gothic-lightest: #c1c1d2;
+    --gothic-white: #e6e6ec;
+  }
+
+  * { 
+    box-sizing: border-box; 
+    padding: 0; 
+    margin: 0; 
+  }
+
+  body {
+    background-color: var(--gothic-black);
+    color: var(--gothic-lightest);
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+
+  .document-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--gothic-darkest);
+    padding: 50px;
+    border-radius: 8px;
+    border: 2px solid var(--gothic-darker);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  h1 {
+    color: var(--gothic-white);
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    color: var(--gothic-white);
+    font-size: 22px;
+    margin-top: 35px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--gothic-darker);
+    padding-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 18px;
+    font-size: 16px;
+  }
+
+  ul {
+    margin-bottom: 18px;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 10px;
+  }
+
+  strong {
+    color: var(--gothic-lighter);
+  }
+
+  .date {
+    color: var(--gothic-dark);
+    margin-bottom: 35px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="document-container">
+  <h1>Privacy Policy</h1>
+  <p class="date">Last updated: March 18, 2026</p>
+  
+  <p>This Privacy Policy explains how our Majo Search extension handles your data. Because this extension operates entirely locally on your device, your data never leaves your browser.</p>
+
+  <h2>1. Data We Access</h2>
+  <p>To provide this "find in page" functionality, the extension requires access to the following strictly within your active tab:</p>
+  <ul>
+      <li><strong>Website Content:</strong> The extension reads the text nodes of the webpage you are currently viewing to execute local search algorithms (Exact, RegEx, Fuzzy, Phonetic) and highlight matches.</li>
+      <li><strong>User Activity:</strong> We monitor specific keystrokes (such as Escape or Enter) and scroll events solely to manage the search interface and navigate between search results.</li>
+      <li><strong>Web History:</strong> We access the current page URL to enable the search interface on the active page.</li>
+  </ul>
+
+  <h2>2. Data Storage & Processing</h2>
+  <p>All text parsing, data normalization, and search execution happen synchronously in your browser. Any stored preferences (like your selected search mode or other options) are saved locally using your browser's native <code>storage</code> API. <strong>We do not collect, transmit, or store your data on external servers.</strong></p>
+
+  <h2>3. Developer Disclosures & Compliance</h2>
+  <p>In compliance with Chrome Web Store Developer Program Policies, we certify the following regarding user data:</p>
+  <ul>
+      <li>We <strong>do not sell or transfer</strong> user data to third parties.</li>
+      <li>We <strong>do not use or transfer</strong> user data for purposes unrelated to the extension's single core purpose (advanced local text search).</li>
+      <li>We <strong>do not use or transfer</strong> user data to determine creditworthiness or for lending purposes.</li>
+  </ul>
+
+  <h2>4. Third-Party Services</h2>
+  <p>This extension does not use any third-party analytics, tracking scripts, or external APIs. Your browsing history and page content remain strictly private to your machine.</p>
+
+  <h2>5. Changes to This Policy</h2>
+  <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.</p>
+</div>
+
+</body>
+</html>
