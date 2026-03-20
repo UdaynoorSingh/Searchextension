@@ -14,6 +14,7 @@ export const DEFAULT_SETTINGS = {
     langDialect: "en-US",
     showMatchDiacritics: false,
     scrollSnap: true,
+    
     lastMode: "normal",
     theme: "modern",
 

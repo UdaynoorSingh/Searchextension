@@ -57,7 +57,7 @@ async function search(query) {
     UiSeter.updateSearchState(Constants.SEARCH_STATES.searching);
 
     try {
-        if (!query) {
+        if (!query || (matcherOptions.matchType === "RegEx" && query === "//gm")) {
             UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
             return;
         }
@@ -75,7 +75,11 @@ async function search(query) {
             }
 
             for (let i = 0; i < nodeObjs.length; i++) {
-                nodeObjs[i].matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
+                const matches = Matcher.match(nodeObjs[i].normalizedTextContent, query, matcherOptions);
+                if (matcherOptions.matchType === "RegEx" && matches === undefined) { // ? only RegEx can return undefined explicitly 
+                    throw new Error("Undefined coming from regex"); // ? This purely exists so that code goes to catch block and reset the ui
+                }
+                nodeObjs[i].matches = matches;
             }
 
 
@@ -83,7 +87,6 @@ async function search(query) {
             // ? It will registar the new search but it will strictly wait for this to end as no await is being used after this line
 
             Iterator.init(iteratorPane);
-            // ?!
             startDynamicSearch(query, matcherOptions, normalizerOptions, parserOptions, signal, shadowRoots);
 
             for (let i = 0; i < nodeObjs.length; i++) {

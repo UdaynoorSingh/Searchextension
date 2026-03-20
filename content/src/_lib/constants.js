@@ -32,23 +32,30 @@ export const PREF = {
 };
 
 export const DEFAULT_SETTINGS = {
+
+    hasBoarded: false,
+    varsion: "1.0.0",
+    showRegexSearch: false,
+    showFuzzySearch: true,
+    showPhoneticSearch: true,
+
     extensionOn: true,
     askForRatingsAlarmLimit: 7, // * In days
     isDev: false,
     langDialect: "en-US",
     showMatchDiacritics: false,
-    scrollSnap: false,
+    scrollSnap: true,
     lastMode: "normal",
+    theme: "modern",
 
     lastNav: true,
     lastMain: true,
     lastCode: true,
 
-    lastMatchCase: true,
-    lastMatchWhole: true,
-    lastMatchDiacritics: true,
+    lastMatchCase: false,
+    lastMatchWhole: false,
+    lastMatchDiacritics: false,
 };
-
 
 export const HIGHLIGHTED_EL_CLASSNAME = "search-ext-highlight";
 export const HIGHLIGHTED_EL_TAGNAME = "MARK";

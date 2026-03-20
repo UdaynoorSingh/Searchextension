@@ -79,14 +79,22 @@ function exactMatch(text, query, matchWhole) {
 */
 function regexMatch(text, query) {
     try {
+
         const matches = [];
 
         // ? here () makes a group showing what to return
         // * A regex matches the  /pattern/flags
-        const parsedQuery = query.match(/^\/(.+)\/([dgimsuyv]*)$/);
+        // ? 0 or more letters of any types  
+        const parsedQuery = query.match(/^\/(.*)\/([dgimsuyv]*)$/);
 
         const pattern = parsedQuery[1];
         const flags = parsedQuery[2];
+
+
+        if (pattern === "") {
+            // ShowError("Please provide some pattern!");
+            return;
+        }
 
         if (!flags.includes("g")) {
             ShowError("Regular Expression must contain g flag!");
@@ -103,7 +111,7 @@ function regexMatch(text, query) {
 
         return matches;
     } catch (error) {
-        console.error("regex matching > ", error, query);
+        console.log("regex matching > ", error, query);
         ShowError("Error using this regular expression!");
     }
 }
@@ -129,7 +137,7 @@ function fuzzyMatch(text, query) {
 
     const fuse = new Fuse(tokens, {
         keys: ['word'],
-        threshold: 0.5,
+        threshold: 0.28,
         minMatchCharLength: Math.min(2, query.length)
     });
 
