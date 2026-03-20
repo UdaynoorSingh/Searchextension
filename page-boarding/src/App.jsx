@@ -193,8 +193,18 @@ function App() {
                     <div className="content-body text-center">
                       <h2>You are all set!</h2>
                       <p className="final-text">
-                        You can change/find more options anytime from the <a href="/page-options/dist/index.html" target="_blank" rel="noreferrer">Options page</a>.
+                        You can change/find more options anytime from the <a onClick={(e) => {
+                          e.preventDefault();
+                          chrome.tabs.create({ url: chrome.runtime.getURL("page-options/dist/index.html") });
+                        }} target="_blank" rel="noreferrer">Options page</a>.
+                        <br />
+                        You may also visit <a onClick={(e) => {
+                          e.preventDefault();
+                          chrome.tabs.create({ url: chrome.runtime.getURL("page-tips-tricks-and-help/index.html") });
+                        }} target="_blank" >Tricks, Tips and Help page</a>.
+
                       </p>
+
 
                       <div className="image-wrapper">
                         {/* Replace the src below with your actual image path */}

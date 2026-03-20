@@ -9,7 +9,7 @@ chrome.runtime.onInstalled.addListener(async details => {
         });
 
         chrome.tabs.create({ url: chrome.runtime.getURL("page-boarding/dist/index.html") });
-        // TODO: chrome.runtime.setUninstallURL('https://www.ainoyash.com/projects/pokemon-retro-themes/help-and-feedback');
+        chrome.runtime.setUninstallURL('https://docs.google.com/forms/d/e/1FAIpQLSc1gqbiMHNq3ZUuJCpTXG5BSB8tu6lRwNM5NsB5LwjfsDT0Kg/viewform');
         
     }
     else if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {

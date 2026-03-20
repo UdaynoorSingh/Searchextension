@@ -2,7 +2,6 @@
 import "./core/install.js";
 import "./core/rating.js";
 import "./core/contextMenu.js";
-
 import { getPreference, isBoardingPage, validateTabAndNotify } from "./_lib/utils.js";
 
 
@@ -56,12 +55,12 @@ async function onSearchCurrentPageCmd(tab) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.target === 'background') {
         switch (message.action) {
-            case "show-error-delegation":
+            case "show-error-delegation": {
                 if (message.delegateTo === "tab") {
                     chrome.tabs.sendMessage(message.oriSenderId, { target: "tab", action: "show-error", error: message.error });
                 }
                 break;
-
+            }
             default:
                 break;
         }

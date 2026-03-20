@@ -279,7 +279,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             };
 
             recognition.onerror = (event) => {
-                console.log("ui > recognition error >",event.error);
+                console.log("ui > recognition error >", event.error);
 
                 let errorMsg;
 
@@ -328,15 +328,13 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
 
         const query = e.target.value;
 
-        if (uiStates.normal) {
-            if (debouncer) {
-                clearTimeout(debouncer);
-                debouncer = null;
-            }
-            debouncer = setTimeout(() => {
-                search(query);
-            }, 50);
+        if (debouncer) {
+            clearTimeout(debouncer);
+            debouncer = null;
         }
+        debouncer = setTimeout(() => {
+            search(query);
+        }, 50);
 
         // ? When you are not in normal search mode then changing input should clear current highlights
         regexAutoSetted = false;

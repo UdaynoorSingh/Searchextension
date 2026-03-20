@@ -22,7 +22,7 @@ chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIn
 
         switch (buttonIndex) {
             // ? Rate button
-            case 0:
+            case 0: {
                 chrome.tabs.create({
                     // TODO: change link
                     url: "https://chromewebstore.google.com/detail/retro-pokemon-themes-brin/emofnbdnchknpahlndbocpnibddpebbe/reviews"
@@ -30,16 +30,19 @@ chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIn
                 chrome.alarms.clear("ask-for-ratings-alarm");
                 break;
 
-            // ? Later button
+                // ? Later button
+            }
             case 1:
-                const askForRatingsAlarmLimit = await getPreference("askForRatingsAlarmLimit");
+                {
+                    const askForRatingsAlarmLimit = await getPreference("askForRatingsAlarmLimit");
 
-                chrome.alarms.create("ask-for-ratings-alarm", {
-                    delayInMinutes: askForRatingsAlarmLimit * 24 * 60
-                });
+                    chrome.alarms.create("ask-for-ratings-alarm", {
+                        delayInMinutes: askForRatingsAlarmLimit * 24 * 60
+                    });
 
-                chrome.storage.local.set({ "askForRatingsAlarmLimit": (askForRatingsAlarmLimit * 2) });
-                break;
+                    chrome.storage.local.set({ "askForRatingsAlarmLimit": (askForRatingsAlarmLimit * 2) });
+                    break;
+                }
             default:
                 break;
         }
@@ -53,7 +56,7 @@ chrome.notifications.onClosed.addListener(async (notificationId, byUser) => {
 
 
     switch (notificationId) {
-        case "ask-for-ratings-notification":
+        case "ask-for-ratings-notification": {
 
             if (byUser) {
                 const askForRatingsAlarmLimit = await getPreference("askForRatingsAlarmLimit");
@@ -76,7 +79,7 @@ chrome.notifications.onClosed.addListener(async (notificationId, byUser) => {
 
             notificationClosedViaUserClick = false;
             break;
-
+        }
         default:
             break;
     }

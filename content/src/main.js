@@ -81,7 +81,7 @@ async function search(query) {
 
             // ? Remember the if the user presses or changes the search query then if this is running it is not going to stop
             // ? It will registar the new search but it will strictly wait for this to end as no await is being used after this line
-            
+
             Iterator.init(iteratorPane);
             // ?!
             startDynamicSearch(query, matcherOptions, normalizerOptions, parserOptions, signal, shadowRoots);
@@ -89,14 +89,14 @@ async function search(query) {
             for (let i = 0; i < nodeObjs.length; i++) {
                 // ? For performance issues this is here 
                 if (!Parser.isNodeVisible(nodeObjs[i].node)) continue;
-                
+
                 for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {
                     const match = nodeObjs[i].matches[j];
                     Iterator.appendNode(Highlighter.highlightTextNode(nodeObjs[i].node, match.startIndex, match.matchLength));
                 }
             }
         }
-        
+
         // startDynamicSearch(query, matcherOptions, normalizerOptions, parserOptions, signal, shadowRoots);
         UiSeter.updateSearchState(Constants.SEARCH_STATES.complete);
     } catch (error) {
@@ -112,7 +112,7 @@ function init() {
     chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         if (message.target === "tab") {
             switch (message.action) {
-                case "search-current-page":
+                case "search-current-page": {
 
                     if (document.readyState === "loading") {
                         alert("Please let the page load");
@@ -158,11 +158,13 @@ function init() {
                         search(searchInput.value);
                     }
                     break;
-                case "extension-off":
+                }
+                case "extension-off": {
                     searchContainer.style.display = "none";
                     // ? remove hightlights and on going queries 
                     search("");
                     break;
+                }
                 default:
                     break;
             }

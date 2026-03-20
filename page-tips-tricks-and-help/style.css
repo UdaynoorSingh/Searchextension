@@ -1,0 +1,156 @@
+:root {
+    --gothic-black: #0e0e12;
+    --gothic-darkest: #1a1a24;
+    --gothic-darker: #333346;
+    --gothic-dark: #535373;
+    --gothic-dark-faded: rgba(83, 83, 115, 0.5);
+    --gothic-light: #8080a4;
+    --gothic-light-faded: rgba(128, 128, 164, 0.5);
+    --gothic-lighter: #a6a6bf;
+    --gothic-lightest: #c1c1d2;
+    --gothic-white: #e6e6ec;
+    --border-thickness: 2px;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+}
+
+a{
+    cursor: pointer;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+}
+
+body {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    font-size: 16px;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 15%; /* Swapped static 375px for % to handle resizing better */
+    color: var(--gothic-darkest);
+    background-color: var(--gothic-lightest);
+    font-family: sans-serif;
+}
+
+h1 {
+    font-size: 32px;
+    text-align: center;
+}
+
+h2 {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 40px;
+    text-align: center;
+    color: var(--gothic-dark);
+}
+
+h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: var(--border-thickness) solid var(--gothic-light-faded);
+    color: var(--gothic-black);
+}
+
+h4 {
+    font-size: 18px;
+    margin: 25px 0 15px 0;
+    color: var(--gothic-darker);
+}
+
+a {
+    color: var(--gothic-black);
+    text-decoration: underline;
+    text-decoration-color: var(--gothic-dark-faded);
+}
+
+a:hover {
+    color: var(--gothic-dark);
+}
+
+/* Container for the main text */
+.content-container {
+    width: 100%;
+    max-width: 1000px;
+    background-color: var(--gothic-white);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--gothic-light-faded);
+    margin-bottom: 40px;
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+section:last-child {
+    margin-bottom: 0;
+}
+
+/* Normal Bullet Points */
+ul {
+    list-style-type: disc;
+    padding-left: 25px;
+}
+
+li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+    color: var(--gothic-darker);
+}
+
+code {
+    background-color: var(--gothic-lightest);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+    color: var(--gothic-black);
+}
+
+/* Q/A Formatting */
+dl {
+    background-color: var(--gothic-lightest);
+    padding: 20px;
+    border-radius: 6px;
+    border-left: 4px solid var(--gothic-dark);
+}
+
+dt {
+    font-weight: bold;
+    margin-top: 20px;
+    color: var(--gothic-black);
+}
+
+dt:first-child {
+    margin-top: 0;
+}
+
+dd {
+    margin-top: 6px;
+    margin-left: 0;
+    line-height: 1.6;
+    color: var(--gothic-darker);
+}
+
+.footer {
+    margin-top: auto;
+    padding-bottom: 30px;
+}
+
+.footer h1 {
+    font-size: 18px;
+    font-weight: normal;
+}
