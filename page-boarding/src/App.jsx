@@ -193,13 +193,13 @@ function App() {
                     <div className="content-body text-center">
                       <h2>You are all set!</h2>
                       <p className="final-text">
-                        You can change your options anytime from the <a href="/page-options/index.html" target="_blank" rel="noreferrer">boarding options page</a>.
+                        You can change/find more options anytime from the <a href="/page-options/dist/index.html" target="_blank" rel="noreferrer">Options page</a>.
                       </p>
 
                       <div className="image-wrapper">
                         {/* Replace the src below with your actual image path */}
                         <img
-                          src="https://via.placeholder.com/640x360/333346/c1c1d2?text=Your+16:9+Image+Here"
+                          src="output.gif"
                           alt="Ready to go"
                           className="aspect-ratio-image"
                         />

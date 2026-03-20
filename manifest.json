@@ -1,10 +1,10 @@
 {
     "manifest_version": 3,
-    "name": "Majo - Smartest Ctrl+F, Find in page search",
+    "name": "Majo - Smartest Ctrl+F, Find-in-page Search",
     "short_name": "Majo Search",
     "version": "1.0.0",
     "version_name": "Magic 0",
-    "description": "Replace Ctrl+F with advanced find-in-page features like regex, typo-tolerance, sound-alike matching, and contextual meaning.",
+    "description": "Replace Ctrl+F with advanced find-in-page features like regex, typo-tolerance, and sounds-alike matching.",
     "icons": {
         "16": "assets/16.png",
         "32": "assets/32.png",
@@ -59,9 +59,6 @@
             },
             "description": "Search in current page"
         }
-    },
-    "content_security_policy": {
-        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'"
     },
     "options_ui": {
         "page": "page-options/dist/index.html",

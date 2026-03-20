@@ -21,7 +21,7 @@ let controller = null;
 let lastQuery = null;
 let optionsChangedObj = { optionsChanged: false };
 
-
+let shadowRoots = [];
 
 // ! Remember if you add a new object here and in uiStates you have to bridge them by proxy in uiStates
 export const normalizerOptions = { matchDiacritics: false, caseInsensitive: true };
@@ -48,7 +48,12 @@ async function search(query) {
     const signal = controller.signal;
 
     Iterator.clearNodes();
-    Highlighter.clearHighlights();
+
+    Highlighter.clearHighlights(); // ? clear highlights of body
+    shadowRoots.forEach(sr => {
+        Highlighter.clearHighlights(sr); // ? clear all shadow roots
+    });
+
     UiSeter.updateSearchState(Constants.SEARCH_STATES.searching);
 
     try {
@@ -58,11 +63,10 @@ async function search(query) {
         }
         else {
 
-            // ! Will need to add logic where query is too big
             query = Normalizer.normalize(query, normalizerOptions);
 
-
-            const nodes = Parser.getTextNodes(document.body, parserOptions);
+            const nodes = [];
+            Parser.getTextNodes(document.body, shadowRoots, nodes, parserOptions); // ? getTextNodes is a procedure adding all textNodes to nodes
             const nodeObjs = [];
 
             for (let i = 0; i < nodes.length; i++) {
@@ -77,26 +81,27 @@ async function search(query) {
 
             // ? Remember the if the user presses or changes the search query then if this is running it is not going to stop
             // ? It will registar the new search but it will strictly wait for this to end as no await is being used after this line
-
+            
             Iterator.init(iteratorPane);
+            // ?!
+            startDynamicSearch(query, matcherOptions, normalizerOptions, parserOptions, signal, shadowRoots);
 
             for (let i = 0; i < nodeObjs.length; i++) {
                 // ? For performance issues this is here 
                 if (!Parser.isNodeVisible(nodeObjs[i].node)) continue;
-
+                
                 for (let j = nodeObjs[i].matches.length - 1; j >= 0; j--) {
                     const match = nodeObjs[i].matches[j];
                     Iterator.appendNode(Highlighter.highlightTextNode(nodeObjs[i].node, match.startIndex, match.matchLength));
                 }
             }
         }
-
-        startDynamicSearch(query, matcherOptions, normalizerOptions, parserOptions, signal);
+        
+        // startDynamicSearch(query, matcherOptions, normalizerOptions, parserOptions, signal, shadowRoots);
         UiSeter.updateSearchState(Constants.SEARCH_STATES.complete);
     } catch (error) {
         console.log("main > search", error);
         lastQuery = null;
-        lastMatchType = null;
         UiSeter.updateSearchState(Constants.SEARCH_STATES.idle);
     }
 }
@@ -138,6 +143,7 @@ function init() {
 
                         if (shadowRoot.activeElement === searchInput) {
                             searchContainer.style.display = "none";
+                            shadowRoots = []; // ? Lose reference so that dynamic shadow roots are garbage collected
                             search("");
                             return;
                         }

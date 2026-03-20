@@ -8,7 +8,7 @@ import { getPreference } from "../_lib/utils.js";
 
 export let updateSearchState = null;
 
-// ! Need to add gif showing logic
+
 export async function setupContainer(parserOptions, normalizerOptions, matcherOptions, optionsChangedObj, search) {
     const body = document.body;
 
@@ -23,7 +23,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
 
     const style = document.createElement("style");
 
-    // ! Do not add comments inside of this text it will cause errors
+
     style.textContent = cssString + panelCssString;
     shadowRoot.appendChild(style);
 
@@ -67,7 +67,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     });
     let regexAutoSetted = false;
     // 2. Proxy the main uiStates object
-    // ! There is something serious going on with proxies!! They are making searching very slow when search mode is changed
+
     uiStates = new Proxy(uiStates, {
         set(target, prop, value) {
             Reflect.set(target, prop, value);
@@ -279,7 +279,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             };
 
             recognition.onerror = (event) => {
-                console.error(event.error);
+                console.log("ui > recognition error >",event.error);
 
                 let errorMsg;
 
@@ -326,7 +326,6 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
 
     input.addEventListener("input", (e) => {
 
-
         const query = e.target.value;
 
         if (uiStates.normal) {
@@ -337,13 +336,10 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
             debouncer = setTimeout(() => {
                 search(query);
             }, 50);
-            search(query);
         }
-        else {
-            // ? When you are not in normal search mode then changing input should clear current highlights
-            regexAutoSetted = false;
-        }
-        search(input.value);
+
+        // ? When you are not in normal search mode then changing input should clear current highlights
+        regexAutoSetted = false;
 
     });
 
@@ -593,7 +589,6 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     matchCaseBtn.addEventListener("click", (e) => {
 
         uiStates.matchCase = !uiStates.matchCase;
-        console.log("new ui state ", uiStates.matchCase);
         e.currentTarget.classList.toggle("active", uiStates.matchCase);
     });
 

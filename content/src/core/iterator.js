@@ -1,6 +1,8 @@
 import { getPreference } from "../_lib/utils.js";
 import * as Constants from "../_lib/constants.js"
 
+// ! e.target.value is a string not a number
+
 let index = null;
 // ? prevIndex exists solely for removing prev highlights
 let prevIndex = null;
@@ -13,6 +15,8 @@ let iteratorPaneResult = null;
 
 let scrollSnap = false;
 let theme = "standard";
+
+let isInitialized = false;
 
 
 (async () => {
@@ -38,34 +42,38 @@ export function init(newIteratorPane) {
 
     iteratorPane.style.top = "-47%";
 
-    iteratorPaneInput.addEventListener('input', (e) => {
+    // ? If we don't put this then it will add a listener every time
+    if (!isInitialized) {
+        iteratorPaneInput.addEventListener('input', (e) => {
 
-        let value = e.target.value.replace(/\D/g, '');
-        let numValue = parseInt(value, 10);
+            let value = e.target.value.replace(/\D/g, '');
+            let numValue = parseInt(value, 10);
 
-        if (numValue > nodes.length) {
-            e.target.value = nodes.length;
-        }
-        else if (numValue < 0) {
-            e.target.value = 1;
-        }
-        else {
-            e.target.value = isNaN(numValue) ? '0' : numValue;
-        }
+            if (numValue > nodes.length) {
+                e.target.value = nodes.length;
+            }
+            else if (numValue < 0) {
+                e.target.value = 1;
+            }
+            else {
+                e.target.value = isNaN(numValue) ? '0' : numValue;
+            }
 
 
-        if (e.target.value === 0) {
-            index = null;
-        }
-        else index = parseInt(e.target.value) - 1;
+            if (e.target.value === "0" || e.target.value === "") {
+                index = null;
+            }
+            else index = parseInt(e.target.value) - 1;
 
-        onIndexChange();
-    });
+            onIndexChange();
+        });
 
-    iteratorPaneInput.addEventListener("focus", (e) => {
-        e.target.select();
-    });
+        iteratorPaneInput.addEventListener("focus", (e) => {
+            e.target.select();
+        });
 
+    }
+    isInitialized = true;
     updateIteratorPane();
 }
 

@@ -19,6 +19,13 @@ export const IGNORED_TAGS = new Set([
     'METER', 'PROGRESS'
 ]);
 
+export const NAV_TAGS = new Set(["NAV", "FOOTER", "A", "ASIDE", "HEADER", "MENU"]);
+export const CODE_TAGS = new Set(["CODE", "PRE", "SAMP", "VAR"]);
+
+export const NAV_SELECTOR = Array.from(NAV_TAGS).join(',');
+export const CODE_SELECTOR = Array.from(CODE_TAGS).join(',');
+
+
 export const PREF = {
     isDev: false,
     langDialect: "en-US"

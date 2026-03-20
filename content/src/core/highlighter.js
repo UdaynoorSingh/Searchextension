@@ -2,19 +2,19 @@
 import * as Constants from "../_lib/constants.js";
 import { getPreference } from "../_lib/utils.js";
 
+let theme = "standard";
+
+(async () => {
+    theme = await getPreference("theme");
+})();
+
+
 // ? for highlighter to work on matches array the array should be in descending order
 /**
 * @param {Node} textNode
 * @param {Number} startIndex
 * @param {Number} matchLength
 */
-let theme = "standard";
-
-(async ()=>{
-    theme = await getPreference("theme");
-})();
-
-
 export function highlightTextNode(textNode, startIndex, matchLength) {
 
     // ? textNode.splitText is going to split node present in DOM into 2 parts
@@ -34,8 +34,13 @@ export function highlightTextNode(textNode, startIndex, matchLength) {
 
         return highlightEl;
 
+        // ? If the error handling was happening over all text nodes at once then the textNodes after error would also be ignoured holy moly i got lucky with this one
     } catch (error) {
-        console.error(error);
+        // ! There will be tons of hightlight errors coming because of split text when the text is coming from dynamic search but the good part is that we need not to solve it
+        // ? It is actually better to not add logic for handling these error as these error do not make result difference
+        // ? The original source of errors is MutationObserver's batching 
+        // ? if i am making 'y' in "yay" then 4 mutations will be created where 2 of the text nodes will be same
+        // console.error("highlighter > highlightTextNode", error);
     }
 }
 
@@ -54,4 +59,3 @@ export function clearHighlights(root = document.body) {
     // ? native DOM method to combine text fragments back together
     root.normalize();
 }
-
