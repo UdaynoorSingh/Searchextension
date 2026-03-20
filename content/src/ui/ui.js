@@ -123,7 +123,6 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
                         if (!(/^\/.*\/[dgimsuyv]*$/.test(inputVal))) {
 
                             input.value = '/' + inputVal + '/gm';
-                            console.log(input.value,  inputVal, "I ran");
                             regexAutoSetted = true;
                             // ? Since the input is already focused we can use this otherwise we wouldn't have been able to use this
                             input.setSelectionRange(inputVal.length + 1, inputVal.length + 1);
@@ -557,10 +556,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     const lastMode = await getPreference("lastMode");
     uiStates[lastMode] = true;
 
-    if (lastMode === "regex") {
-        input.value = "//gm";
-        console.log("i ran");
-    }
+
 
 
     if (lastMode === "regex" && !showRegexSearch) uiStates["normal"] = true;

@@ -124,12 +124,15 @@ function init() {
 
                     const selectedText = window.getSelection().toString();
 
+
                     if (!searchContainer) {
                         // ? Since the variables are already declared we have to use parantesis
                         // ? Name aliasing actualNameComing : newNameHere 
                         ({ input: searchInput, container: searchContainer, shadowRoot: shadowRoot, host: shadowRootHost, iteratorPane: iteratorPane } = await UiSeter.setupContainer(parserOptions, normalizerOptions, matcherOptions, optionsChangedObj, search));
                         interceptGlobalKeyEvents(shadowRootHost);
-                        searchInput.value = selectedText;
+                        if (selectedText !== "") {
+                            searchInput.value = selectedText;
+                        }
                         searchInput.focus();
                         searchInput.select();
                         search(searchInput.value);

@@ -24,7 +24,7 @@ export async function getPreference(key) {
 }
 
 
-// ! Check for microsoft edge
+
 export async function validateTabAndNotify(tab) {
     // tab.url might be undefined on some internal pages depending on permissions, fallback to pendingUrl
     const url = tab.url || tab.pendingUrl || "";

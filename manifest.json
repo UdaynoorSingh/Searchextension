@@ -28,7 +28,7 @@
         "notifications",
         "alarms",
         "contextMenus",
-        "tabs"
+        "activeTab"
     ],
     "web_accessible_resources": [
         {

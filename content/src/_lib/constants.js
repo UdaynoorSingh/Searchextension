@@ -1,6 +1,6 @@
 'use strict';
-// ! SVGs & Canvas: Text inside <svg> uses <text> elements which behave differently than standard HTML text nodes
-// ! and will break if wrapped in standard HTML highlight tags.
+// ? SVGs & Canvas: Text inside <svg> uses <text> elements which behave differently than standard HTML text nodes
+// ? and will break if wrapped in standard HTML highlight tags.
 
 
 export const IGNORED_TAGS = new Set([

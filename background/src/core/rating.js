@@ -25,8 +25,7 @@ chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIn
             case 0:
                 {
                     chrome.tabs.create({
-                        // TODO: change link
-                        url: "https://chromewebstore.google.com/detail/retro-pokemon-themes-brin/emofnbdnchknpahlndbocpnibddpebbe/reviews"
+                        url: "https://chromewebstore.google.com/detail/majo-search/hlakcdjgidoppjilpbephlhkfbkdmdco/reviews"
                     });
                     chrome.alarms.clear("ask-for-ratings-alarm");
                     break;
