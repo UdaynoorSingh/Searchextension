@@ -22,16 +22,17 @@ chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIn
 
         switch (buttonIndex) {
             // ? Rate button
-            case 0: {
-                chrome.tabs.create({
-                    // TODO: change link
-                    url: "https://chromewebstore.google.com/detail/retro-pokemon-themes-brin/emofnbdnchknpahlndbocpnibddpebbe/reviews"
-                });
-                chrome.alarms.clear("ask-for-ratings-alarm");
-                break;
+            case 0:
+                {
+                    chrome.tabs.create({
+                        // TODO: change link
+                        url: "https://chromewebstore.google.com/detail/retro-pokemon-themes-brin/emofnbdnchknpahlndbocpnibddpebbe/reviews"
+                    });
+                    chrome.alarms.clear("ask-for-ratings-alarm");
+                    break;
 
-                // ? Later button
-            }
+                    // ? Later button
+                }
             case 1:
                 {
                     const askForRatingsAlarmLimit = await getPreference("askForRatingsAlarmLimit");

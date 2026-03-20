@@ -2,6 +2,7 @@
 import * as Constants from "../_lib/constants.js"
 import { doubleMetaphone } from 'double-metaphone'
 import Fuse from 'fuse.js';
+import { ShowError } from "../ui/ui.js";
 
 /**
 * @param {string} text 
@@ -13,17 +14,25 @@ export function match(text, query, options) {
 
     switch (options.matchType) {
         case "Exact":
-            return exactMatch(text, query, options.matchWhole);
-            break;
+            {
+                return exactMatch(text, query, options.matchWhole);
+                break;
+            }
         case "RegEx":
-            return regexMatch(text, query);
-            break;
+            {
+                return regexMatch(text, query);
+                break;
+            }
         case "Fuzzy":
-            return fuzzyMatch(text, query);
-            break;
+            {
+                return fuzzyMatch(text, query);
+                break;
+            }
         case "Phonetic":
-            return phoneticMatch(text, query);
-            break;
+            {
+                return phoneticMatch(text, query);
+                break;
+            }
 
         default:
             console.error("Matcher.match: Fell in default case", options);
@@ -79,6 +88,12 @@ function regexMatch(text, query) {
         const pattern = parsedQuery[1];
         const flags = parsedQuery[2];
 
+        if (!flags.includes("g")) {
+            ShowError("Regular Expression must contain g flag!");
+            return;
+        }
+
+
         const regex = new RegExp(pattern, flags);
 
         // ? string.matchAll() returns an iterator
@@ -88,7 +103,8 @@ function regexMatch(text, query) {
 
         return matches;
     } catch (error) {
-        console.error(error);
+        console.error("regex matching > ", error, query);
+        ShowError("Error using this regular expression!");
     }
 }
 
@@ -103,17 +119,17 @@ function fuzzyMatch(text, query) {
 
     const tokens = [];
     const regex = new RegExp(/[a-zA-Z]+(?:['\-][a-zA-Z]+)*/, 'g');
-    
+
     for (const match of text.matchAll(regex)) {
-        tokens.push({ 
-            word: match[0], 
-            startIndex: match.index 
+        tokens.push({
+            word: match[0],
+            startIndex: match.index
         });
     }
 
     const fuse = new Fuse(tokens, {
-        keys: ['word'],       
-        threshold: 0.5,        
+        keys: ['word'],
+        threshold: 0.5,
         minMatchCharLength: Math.min(2, query.length)
     });
 

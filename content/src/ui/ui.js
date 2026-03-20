@@ -7,7 +7,7 @@ import * as Iterator from "../core/iterator.js";
 import { getPreference } from "../_lib/utils.js";
 
 export let updateSearchState = null;
-
+let shadowRootGlb = null;
 
 export async function setupContainer(parserOptions, normalizerOptions, matcherOptions, optionsChangedObj, search) {
     const body = document.body;
@@ -18,6 +18,7 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     host.style.zIndex = "2147483647";
 
     const shadowRoot = host.attachShadow({ mode: "closed" });
+    shadowRootGlb = shadowRoot;
 
     const isDev = await getPreference("isDev");
 
@@ -328,13 +329,15 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
 
         const query = e.target.value;
 
-        if (debouncer) {
-            clearTimeout(debouncer);
-            debouncer = null;
+        if (!uiStates.regex) {
+            if (debouncer) {
+                clearTimeout(debouncer);
+                debouncer = null;
+            }
+            debouncer = setTimeout(() => {
+                search(query);
+            }, 50);
         }
-        debouncer = setTimeout(() => {
-            search(query);
-        }, 50);
 
         // ? When you are not in normal search mode then changing input should clear current highlights
         regexAutoSetted = false;
@@ -436,21 +439,26 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     function onSearchStateChange(newState) {
         switch (newState) {
             case Constants.SEARCH_STATES.idle:
-                searchSvgDiv.style.display = "flex";
-                loadingImg.style.display = "none";
-                moveArrows.style.display = "none";
-                break;
+                {
+                    searchSvgDiv.style.display = "flex";
+                    loadingImg.style.display = "none";
+                    moveArrows.style.display = "none";
+                    break;
+                }
             case Constants.SEARCH_STATES.searching:
-                searchSvgDiv.style.display = "none";
-                loadingImg.style.display = "flex";
-                moveArrows.style.display = "none";
-                break;
+                {
+                    searchSvgDiv.style.display = "none";
+                    loadingImg.style.display = "flex";
+                    moveArrows.style.display = "none";
+                    break;
+                }
             case Constants.SEARCH_STATES.complete:
-                searchSvgDiv.style.display = "none";
-                loadingImg.style.display = "none";
-                moveArrows.style.display = "flex";
-                break;
-
+                {
+                    searchSvgDiv.style.display = "none";
+                    loadingImg.style.display = "none";
+                    moveArrows.style.display = "flex";
+                    break;
+                }
             default:
                 break;
         }
@@ -683,17 +691,16 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.target === "tab") {
             switch (message.action) {
-                case "show-error":
+                case "show-error": {
                     new CornerMessage(shadowRoot, message.error).show();
                     break;
-
+                }
                 default:
                     console.log("ui.js > chrome.runtime.onMessage > message.target > default case: " + message.action);
                     break;
             }
         }
     });
-
 
     refreshUi();
 
@@ -702,3 +709,6 @@ export async function setupContainer(parserOptions, normalizerOptions, matcherOp
 
 
 
+export function ShowError(msg) {
+    new CornerMessage(shadowRootGlb, msg).show();
+}
